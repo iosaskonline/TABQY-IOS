@@ -1,0 +1,20 @@
+PODS:
+  - MBProgressHUD (0.9.2)
+  - MVYSideMenu (1.0.1)
+  - SDWebImage (3.8.2):
+    - SDWebImage/Core (= 3.8.2)
+  - SDWebImage/Core (3.8.2)
+
+DEPENDENCIES:
+  - MBProgressHUD (~> 0.9.1)
+  - MVYSideMenu
+  - SDWebImage (~> 3.6)
+
+SPEC CHECKSUMS:
+  MBProgressHUD: 1569cf7ace17a8bac47aabfbb8580a49690386d1
+  MVYSideMenu: 145f5782cf08efd102026c62e8e2aed600a99f34
+  SDWebImage: 098e97e6176540799c27e804c96653ee0833d13c
+
+PODFILE CHECKSUM: 32a3d34563c887ff753cb1a4ca2b65f6924ee5ed
+
+COCOAPODS: 1.1.1
