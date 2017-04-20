@@ -44,6 +44,14 @@
     // Do any additional setup after loading the view from its nib.
     
     [self startServiceToGetProfile];
+    
+    
+    
+    
+    
+    
+    
+    
 }
 
 - (void)didReceiveMemoryWarning {

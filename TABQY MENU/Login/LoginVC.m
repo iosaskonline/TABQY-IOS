@@ -39,6 +39,11 @@
 
     [self.txtUserName setPadding];
      [self.txtPassword setPadding];
+    
+    
+    
+    
+    
 }
 
 - (void)didReceiveMemoryWarning {

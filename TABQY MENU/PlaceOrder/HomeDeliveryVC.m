@@ -48,6 +48,11 @@
     self.txtTime.text=[self.dict valueForKey:@"order_time"];
     self.txtOrderId.text=[self.dict valueForKey:@"order_no"];
     self.txtTotalCast.text=[self.dict valueForKey:@"total_cost"];
+    
+    
+    
+    
+    
     // Do any additional setup after loading the view from its nib.
 }
 
