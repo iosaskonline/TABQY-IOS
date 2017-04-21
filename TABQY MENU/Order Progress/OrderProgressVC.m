@@ -262,10 +262,7 @@
             
                 [self.arrayOrderProgress addObject:object];
             
-            
-            
-            
-            
+        
         }
         NSLog(@"arrayCompletedOrder=%@",self.arrayCompletedOrder);
         NSLog(@"arrayOrderProgress=%@",self.arrayOrderProgress);
@@ -344,8 +341,6 @@
                                  date,@"to_date",
                                  nil];
     
-    
-    
     [class addJson:dict];
     [class setCallback:@selector(callBackServiceToGetOrderInProgressByTable:)];
     [class setController:self];
@@ -407,8 +402,6 @@
                                  date,@"to_date",
                                  nil];
     
-    
-    
     [class addJson:dict];
     [class setCallback:@selector(callBackServiceToGetOrdertable:)];
     [class setController:self];
@@ -424,18 +417,20 @@
     {
           [self.arraySelectedIndex addObject:@"0"];
         self.arrayOrderProgress=[[NSMutableArray alloc]init];
-        // self.arrayCompletedOrder=[[NSMutableArray alloc]init];
+       
         NSArray *arr=[rootDictionary valueForKey:@"waitertable"];
-        for (NSDictionary * dictionary in arr)
-        {
-            
-             TableListObject  *object=[ TableListObject instanceFromDictionary:dictionary];
-            
-            [self.arraySelectedTable addObject:object];
-            
-            
-
-        }
+            for (NSDictionary * dictionary in arr)
+            {
+                
+                TableListObject  *object=[ TableListObject instanceFromDictionary:dictionary];
+                
+                [self.arraySelectedTable addObject:object];
+                
+                
+                
+            }
+        
+       
         
         
             TableListObject *homeDelivery=[[TableListObject alloc]init];

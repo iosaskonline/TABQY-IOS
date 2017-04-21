@@ -105,6 +105,10 @@
 		C522C20C1E97D4C300A95367 /* TPKeyboardAvoidingScrollView.m in Sources */ = {isa = PBXBuildFile; fileRef = C522C2061E97D4C300A95367 /* TPKeyboardAvoidingScrollView.m */; };
 		C522C20D1E97D4C300A95367 /* TPKeyboardAvoidingTableView.m in Sources */ = {isa = PBXBuildFile; fileRef = C522C2081E97D4C300A95367 /* TPKeyboardAvoidingTableView.m */; };
 		C522C20E1E97D4C300A95367 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */ = {isa = PBXBuildFile; fileRef = C522C20A1E97D4C300A95367 /* UIScrollView+TPKeyboardAvoidingAdditions.m */; };
+		C52999BC1EA9DB3900A516B5 /* CompleteOrderVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C52999BA1EA9DB3900A516B5 /* CompleteOrderVC.m */; };
+		C52999BD1EA9DB3900A516B5 /* CompleteOrderVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C52999BB1EA9DB3900A516B5 /* CompleteOrderVC.xib */; };
+		C52999BF1EA9DFAD00A516B5 /* btn.png in Resources */ = {isa = PBXBuildFile; fileRef = C52999BE1EA9DFAD00A516B5 /* btn.png */; };
+		C52999C21EAA2D1400A516B5 /* AssociatedFoods.m in Sources */ = {isa = PBXBuildFile; fileRef = C52999C11EAA2D1400A516B5 /* AssociatedFoods.m */; };
 		C5309D761EA0A95C006AA835 /* HomeDeliveryVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C5309D741EA0A95C006AA835 /* HomeDeliveryVC.m */; };
 		C5309D771EA0A95C006AA835 /* HomeDeliveryVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5309D751EA0A95C006AA835 /* HomeDeliveryVC.xib */; };
 		C5309D7C1EA0DD04006AA835 /* TableListVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C5309D7A1EA0DD04006AA835 /* TableListVC.m */; };
@@ -324,6 +328,12 @@
 		C522C2081E97D4C300A95367 /* TPKeyboardAvoidingTableView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = TPKeyboardAvoidingTableView.m; sourceTree = "<group>"; };
 		C522C2091E97D4C300A95367 /* UIScrollView+TPKeyboardAvoidingAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIScrollView+TPKeyboardAvoidingAdditions.h"; sourceTree = "<group>"; };
 		C522C20A1E97D4C300A95367 /* UIScrollView+TPKeyboardAvoidingAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIScrollView+TPKeyboardAvoidingAdditions.m"; sourceTree = "<group>"; };
+		C52999B91EA9DB3900A516B5 /* CompleteOrderVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CompleteOrderVC.h; sourceTree = "<group>"; };
+		C52999BA1EA9DB3900A516B5 /* CompleteOrderVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CompleteOrderVC.m; sourceTree = "<group>"; };
+		C52999BB1EA9DB3900A516B5 /* CompleteOrderVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CompleteOrderVC.xib; sourceTree = "<group>"; };
+		C52999BE1EA9DFAD00A516B5 /* btn.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = btn.png; sourceTree = "<group>"; };
+		C52999C01EAA2D1400A516B5 /* AssociatedFoods.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssociatedFoods.h; sourceTree = "<group>"; };
+		C52999C11EAA2D1400A516B5 /* AssociatedFoods.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssociatedFoods.m; sourceTree = "<group>"; };
 		C5309D731EA0A95C006AA835 /* HomeDeliveryVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HomeDeliveryVC.h; sourceTree = "<group>"; };
 		C5309D741EA0A95C006AA835 /* HomeDeliveryVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HomeDeliveryVC.m; sourceTree = "<group>"; };
 		C5309D751EA0A95C006AA835 /* HomeDeliveryVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HomeDeliveryVC.xib; sourceTree = "<group>"; };
@@ -461,6 +471,11 @@
 				C5309D731EA0A95C006AA835 /* HomeDeliveryVC.h */,
 				C5309D741EA0A95C006AA835 /* HomeDeliveryVC.m */,
 				C5309D751EA0A95C006AA835 /* HomeDeliveryVC.xib */,
+				C52999B91EA9DB3900A516B5 /* CompleteOrderVC.h */,
+				C52999BA1EA9DB3900A516B5 /* CompleteOrderVC.m */,
+				C52999BB1EA9DB3900A516B5 /* CompleteOrderVC.xib */,
+				C52999C01EAA2D1400A516B5 /* AssociatedFoods.h */,
+				C52999C11EAA2D1400A516B5 /* AssociatedFoods.m */,
 			);
 			path = PlaceOrder;
 			sourceTree = "<group>";
@@ -777,6 +792,7 @@
 		C51DF96D1E8F9AE50013136F /* Images */ = {
 			isa = PBXGroup;
 			children = (
+				C52999BE1EA9DFAD00A516B5 /* btn.png */,
 				C5675FE51E9F81BC00F08F1C /* add-more.png */,
 				C5675FE61E9F81BC00F08F1C /* home_delivery.png */,
 				C5675FE71E9F81BC00F08F1C /* submit_order.png */,
@@ -959,6 +975,7 @@
 				C515563C1E8FCB3E00638667 /* today's_special_hover.png in Resources */,
 				C51556651E8FE7B600638667 /* HotDealVC.xib in Resources */,
 				C51909521E928431009F11F7 /* arrow-left.png in Resources */,
+				C52999BF1EA9DFAD00A516B5 /* btn.png in Resources */,
 				C51556791E8FE87500638667 /* TodaySplVC.xib in Resources */,
 				C5E6F3301E9377FB00A5671E /* Splash-Screen.jpg in Resources */,
 				C51556301E8FCB3E00638667 /* dashboard_icon.png in Resources */,
@@ -975,6 +992,7 @@
 				C5C249B71E94F4A000FE8B3A /* table_icon_hover-1.png in Resources */,
 				C5309D771EA0A95C006AA835 /* HomeDeliveryVC.xib in Resources */,
 				C51556601E8FE78C00638667 /* FeedBackVC.xib in Resources */,
+				C52999BD1EA9DB3900A516B5 /* CompleteOrderVC.xib in Resources */,
 				C51556321E8FCB3E00638667 /* feedback_hover.png in Resources */,
 				C5C249BE1E9502F700FE8B3A /* log_out_icon_hover-1.png in Resources */,
 				C587146C1E9E5639003715B5 /* HotDealTableCell.xib in Resources */,
@@ -1142,6 +1160,7 @@
 				C5C249B21E94D6A200FE8B3A /* FoodTypeObject.m in Sources */,
 				C5E6F3411E93963600A5671E /* CousineObject.m in Sources */,
 				C5C249AE1E94D19800FE8B3A /* SegmentedCell.m in Sources */,
+				C52999BC1EA9DB3900A516B5 /* CompleteOrderVC.m in Sources */,
 				C519094C1E926E45009F11F7 /* MenuItemCell.m in Sources */,
 				C515567E1E8FEABC00638667 /* LoginVC.m in Sources */,
 				C51909501E926EBC009F11F7 /* MenuLink.m in Sources */,
@@ -1149,6 +1168,7 @@
 				C5309D851EA0E365006AA835 /* TableListObject.m in Sources */,
 				C51555F21E8FB12600638667 /* ECSBottomBar.m in Sources */,
 				C522C1F51E97970A00A95367 /* FoodDetailVC.m in Sources */,
+				C52999C21EAA2D1400A516B5 /* AssociatedFoods.m in Sources */,
 				C51556691E8FE7E500638667 /* MenuItemVC.m in Sources */,
 				C51556141E8FB1DB00638667 /* ECSHelper.m in Sources */,
 				C5BCF4C71E9532F100469BA8 /* MenuFoodCell.m in Sources */,

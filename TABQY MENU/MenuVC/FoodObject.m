@@ -26,6 +26,7 @@
         self.foodCode = [decoder decodeObjectForKey:@"food_code"];
         self.foodId = [decoder decodeObjectForKey:@"food_id"];
         self.foodCount = [decoder decodeObjectForKey:@"count"];
+         self.foodqty = [decoder decodeObjectForKey:@"qty"];
         self.foodDescription = [decoder decodeObjectForKey:@"description"];
         
         
@@ -37,6 +38,7 @@
 - (void)encodeWithCoder:(NSCoder *)encoder {
     //appLogicId
     [encoder encodeObject:self.associatedFood forKey:@"associated_food"];
+     [encoder encodeObject:self.foodqty forKey:@"qty"];
     [encoder encodeObject:self.foodName forKey:@"name"];
     [encoder encodeObject:self.price forKey:@"price"];
     [encoder encodeObject:self.discountPrice forKey:@"discount_price"];
@@ -88,8 +90,9 @@
     self.foodImage = [aDictionary objectForKey:@"food_image"];
     self.foodCode = [aDictionary objectForKey:@"food_code"];
     self.foodId = [aDictionary objectForKey:@"food_id"];
- self.foodCount = [aDictionary objectForKey:@"count"];
-      self.foodDescription = [aDictionary objectForKey:@"description"];
+    self.foodCount = [aDictionary objectForKey:@"count"];
+    self.foodqty = [aDictionary objectForKey:@"qty"];
+    self.foodDescription = [aDictionary objectForKey:@"description"];
 }
 
 

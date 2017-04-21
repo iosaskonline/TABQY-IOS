@@ -16,6 +16,7 @@
 #import "OrderHistoryTableCell.h"
 #import "TableListObject.h"
 #import "OrderTableCell.h"
+#import "CompleteOrderVC.h"
 @interface OrderHistryVC ()
 {
     NSString *tbleId;
@@ -111,7 +112,7 @@
             {
                 
                 OrderHistryObject  *object=[OrderHistryObject instanceFromDictionary:dictionary];
-                if ([object.type isEqualToString:@"2"]) {
+                if ([object.orderSatatus isEqualToString:@"1"]) {
                     [self.arrayCompletedOrder addObject:object];
                 }else{
                     [self.arrayOrderProgress addObject:object];
@@ -184,12 +185,15 @@
     static NSString *CellIdentifier = @"Cell";
     
     
-    [self.tblHistory registerNib:[UINib nibWithNibName:@"OrderHistoryTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
+[self.tblHistory registerNib:[UINib nibWithNibName:@"OrderHistoryTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
     OrderHistoryTableCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [self.tblHistory setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     cell.backgroundColor = [UIColor clearColor];
     OrderHistryObject *object;
+        [cell.btnDetail addTarget:self action:@selector(clickToshowDetail:) forControlEvents:UIControlEventTouchUpInside];
+        
+
     if (indexPath.section==0) {
          cell.btnFeedback.hidden=NO;
          object=[self.arrayOrderProgress objectAtIndex:indexPath.row];
@@ -206,12 +210,10 @@
         cell.lbltablename.text=@"Home Delivery";
     }
     cell.lblwaitername.text=object.waiterName;
-    
+        cell.btnDetail.tag=indexPath.row;
     return cell;
     }else{
         static NSString *CellIdentifier = @"Cell";
-        
-        
         [self.tblAllTable registerNib:[UINib nibWithNibName:@"OrderTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
         OrderTableCell *cell = [self.tblAllTable dequeueReusableCellWithIdentifier:CellIdentifier ];
         
@@ -225,7 +227,15 @@
 
     }
 
-
+-(void)clickToshowDetail:(id)sender{
+    UIButton *btn=(UIButton *)sender;
+    OrderHistryObject *object=[self.arrayOrderProgress objectAtIndex:btn.tag];
+   
+    //NSString *ordernum=object.orderNum;
+    CompleteOrderVC *nav=[[CompleteOrderVC alloc]initWithNibName:@"CompleteOrderVC" bundle:nil];
+    nav.orderObj=object;
+    [self.navigationController pushViewController:nav animated:YES];
+}
 
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     

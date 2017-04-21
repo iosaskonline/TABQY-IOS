@@ -97,6 +97,9 @@
                             <rect key="frame" x="0.0" y="490" width="323" height="80"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                             <state key="normal" image="add-more.png"/>
+                            <connections>
+                                <action selector="onClickMore:" destination="-1" eventType="touchUpInside" id="Dev-0K-LZD"/>
+                            </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" misplaced="YES" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="3" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="vk2-8j-HPL">
                             <rect key="frame" x="8" y="59" width="333" height="58"/>

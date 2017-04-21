@@ -19,6 +19,7 @@
 #import "AssociatedFoodObject.h"
 #import "OrderTableCell.h"
 #import "TableListObject.h"
+#import "MenuItemVC.h"
 @interface PlaceOrderVC (){
     CGFloat Price;
     CGFloat anotheItemPrice;
@@ -548,7 +549,10 @@
 
 
 
-
+-(IBAction)onClickMore:(id)sender{
+    MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
+    [self.navigationController pushViewController:menuVC animated:YES];
+}
 
 
 /*

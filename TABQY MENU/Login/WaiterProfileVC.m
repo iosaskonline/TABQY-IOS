@@ -17,16 +17,10 @@
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 @property(weak,nonatomic)IBOutlet UILabel *lblName;
 @property(weak,nonatomic)IBOutlet UILabel *lblDesignation;
-
 @property(weak,nonatomic)IBOutlet UILabel *lblCode;
-
 @property(weak,nonatomic)IBOutlet UILabel *lblTotalCost;
-
-
 @property(weak,nonatomic)IBOutlet UIImageView *imgProfile;
-
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage;
-
 
 @end
 

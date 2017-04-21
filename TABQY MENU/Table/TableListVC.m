@@ -19,6 +19,7 @@
 #import "PlaceOrderVC.h"
 #import "TableItemCell.h"
 #import "TableListObject.h"
+#import "MenuItemVC.h"
 @interface TableListVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 
@@ -135,40 +136,9 @@
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     
-//    
-//    MenuLink * object = [arrMenuItem objectAtIndex:indexPath.item];
-//    
-//    MenuCousineVC *nav=[[MenuCousineVC alloc]initWithNibName:@"MenuCousineVC" bundle:nil];
-//    nav.menuId=object.menuId;
-//    nav.menuName=object.menuName;
-//    [self.navigationController pushViewController:nav animated:YES];
-    //    if ([object.url containsString:@"http"]) {
-    //        url =[NSString stringWithFormat:@"%@",object.url];
-    //        contentScreen = [[BC_WebPageVC alloc]initWithURL:url andTitle:object.label];
-    //
-    //        if(contentScreen){
-    //            [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
-    //
-    //        }
-    //
-    //    }else if([object.url isEqualToString:@""]){
-    //        // [ECSAlert showAlert:@"No website Available!"];
-    //        self.viewAlert.hidden=NO;
-    //        self.viewAlert.frame=CGRectMake(0, self.view.frame.size.height-75, 290, 70);
-    //        [self.view addSubview:self.viewAlert];
-    //        [self performSelector:@selector(dismissVC) withObject:self afterDelay:3.0];
-    //
-    //    }else{
-    //        url =[NSString stringWithFormat:@"http://%@",object.url];
-    //        contentScreen = [[BC_WebPageVC alloc]initWithURL:url andTitle:object.label];
-    //
-    //        if(contentScreen){
-    //            [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
-    //
-    //        }
-    //
-    //    }
-    
+    MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
+    [self.navigationController pushViewController:menuVC animated:YES];
+
     
     
 }

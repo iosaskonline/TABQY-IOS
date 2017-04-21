@@ -7,7 +7,9 @@
 //
 
 #import <UIKit/UIKit.h>
-
-@interface CompleteOrderVC : UIViewController
-
+#import "ECSBaseViewController.h"
+#import "OrderHistryObject.h"
+@interface CompleteOrderVC : ECSBaseViewController
+@property(strong,nonatomic)NSMutableArray *savedArray;
+@property(strong,nonatomic) OrderHistryObject *orderObj;
 @end

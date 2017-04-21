@@ -21,8 +21,10 @@
     NSString *foodId;
     NSString *foodDescription;
     NSString *foodCount;
+     NSString *foodqty;
 }
 @property (nonatomic, copy) NSString *foodCount;
+@property (nonatomic, copy) NSString *foodqty;
 @property (nonatomic, copy) NSMutableArray *associatedFood;
 @property (nonatomic, copy) NSString *foodName;
 @property (nonatomic, copy) NSString *price;
