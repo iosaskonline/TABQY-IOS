@@ -11,5 +11,7 @@
 #import "OrderHistryObject.h"
 @interface CompleteOrderVC : ECSBaseViewController
 @property(strong,nonatomic)NSMutableArray *savedArray;
+@property(strong,nonatomic) NSString *selectedOrder;
+
 @property(strong,nonatomic) OrderHistryObject *orderObj;
 @end

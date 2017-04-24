@@ -89,6 +89,10 @@
                                 <color key="textColor" red="0.9152866006" green="0.24655312300000001" blue="0.20107686520000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="3u5-0C-XS0">
+                                <rect key="frame" x="66" y="80" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <userDefinedRuntimeAttributes>
@@ -102,6 +106,7 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <connections>
+                <outlet property="activityInd" destination="3u5-0C-XS0" id="aeJ-9t-eNC"/>
                 <outlet property="btnAdd" destination="6F0-5g-ELB" id="e6D-z6-DXA"/>
                 <outlet property="btnCancel" destination="HEu-En-uAZ" id="dR2-f9-249"/>
                 <outlet property="btnDelete" destination="rTT-Q0-D6Q" id="5yb-P1-eqB"/>

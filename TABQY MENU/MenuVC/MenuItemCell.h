@@ -13,4 +13,5 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblName;
 @property (weak, nonatomic) IBOutlet UILabel *lblCity;
 @property (weak, nonatomic) IBOutlet UIView *viewBg;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityInd;
 @end

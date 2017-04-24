@@ -20,4 +20,5 @@
 @property(weak,nonatomic)IBOutlet UIButton *btnDelete;
 
 @property(weak,nonatomic)IBOutlet UIButton *btnCancel;
+@property(weak,nonatomic)IBOutlet UIActivityIndicatorView *activityInd;
 @end

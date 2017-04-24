@@ -9,5 +9,5 @@
 #import <UIKit/UIKit.h>
 #import "ECSBaseViewController.h"
 @interface PlaceOrderVC : ECSBaseViewController
-@property(strong,nonatomic)NSMutableArray *savedArray;
+//@property(strong,nonatomic)NSMutableArray *savedArray;
 @end

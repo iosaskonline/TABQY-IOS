@@ -15,4 +15,6 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblDiscription;
 @property (weak, nonatomic) IBOutlet UIView *viewBg;
 @property (weak, nonatomic) IBOutlet UIButton *btnCheck;
+@property(weak,nonatomic)IBOutlet UIActivityIndicatorView *activityInd;
+
 @end

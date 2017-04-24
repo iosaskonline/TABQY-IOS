@@ -20,6 +20,7 @@
 #import "TableItemCell.h"
 #import "TableListObject.h"
 #import "MenuItemVC.h"
+#import "SearchFoodVC.h"
 @interface TableListVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 
@@ -35,7 +36,7 @@
     self.arrayTable=[[NSMutableArray alloc]init];
      [self.menuCollectionView  registerNib:[UINib nibWithNibName:@"TableItemCell" bundle:nil]forCellWithReuseIdentifier:@"Cell"];
     // Do any additional setup after loading the view from its nib.
-    [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Place Order",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
+    [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Tables",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
@@ -108,7 +109,7 @@
     return 20.0;
 }
 - (CGSize)collectionView:(UICollectionView *)collectionView layout:(UICollectionViewLayout*)collectionViewLayout sizeForItemAtIndexPath:(NSIndexPath *)indexPath {
-    return CGSizeMake(180, 130);
+    return CGSizeMake(180, 140);
 }
 -(UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -137,6 +138,9 @@
 {
     
     MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
+      TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
+    [ECSUserDefault saveString:connectionObject.tableName ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:connectionObject.tableId ToUserDefaultForKey:@"tableId"];
     [self.navigationController pushViewController:menuVC animated:YES];
 
     
@@ -154,7 +158,12 @@
 
 
 
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 
 
 

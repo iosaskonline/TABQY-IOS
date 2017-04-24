@@ -11,4 +11,5 @@
 @interface MenuCousineVC : ECSBaseViewController
 @property(strong,nonatomic) NSString *menuId;
 @property(strong,nonatomic) NSString *menuName;
+@property(strong,nonatomic) NSString *addMoreSel;
 @end

@@ -148,19 +148,12 @@
     }
     else
     {
-        
+       
         [self.controller.navigationController popViewControllerAnimated:YES];
     }
 }
 
 
-
-//-(void)clickToPlaceOrderList:(id)sender{
-//    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
-//    [self.navigationController pushViewController:nav animated:YES];
-//    
-//    NSLog(@"placeOrderClicked");
-//}
 - (IBAction)clickToOpenSearch:(id)sender
 {
     //[self.delegate addClubsToBounce:self.arraySelectedClubs];

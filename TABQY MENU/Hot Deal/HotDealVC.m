@@ -17,6 +17,7 @@
 #import "PlaceOrderVC.h"
 #import "TableAssociatedCell.h"
 #import "AssociatedFoodObject.h"
+#import "SearchFoodVC.h"
 @interface HotDealVC ()
 {
        NSString *foodIdSelected;
@@ -115,9 +116,9 @@
         cell.imgFood.image = [UIImage imageNamed:@"Pasted image.png"];
     }
     else{
-        
+         [cell.activityInd startAnimating];
         [cell.imgFood ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-            
+            [cell.activityInd stopAnimating];
         }];
         
     }
@@ -190,9 +191,9 @@
             cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
         }
         else{
-            
+             [cell.activityInd startAnimating];
             [cell.img_view ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-                
+                 [cell.activityInd stopAnimating];
             }];
             
         }
@@ -446,7 +447,7 @@
     NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
     [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
     
-    nav.savedArray=self.arraySelectedfoodSave;
+  //  nav.savedArray=self.arraySelectedfoodSave;
    
     
     [self.navigationController pushViewController:nav animated:YES];
@@ -472,7 +473,12 @@
 }
 
 
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

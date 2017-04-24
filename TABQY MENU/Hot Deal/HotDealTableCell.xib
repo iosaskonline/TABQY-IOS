@@ -73,6 +73,10 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxY="YES"/>
                                 <state key="normal" image="add_icon.png"/>
                             </button>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="OOc-29-ykf">
+                                <rect key="frame" x="66" y="62" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <userDefinedRuntimeAttributes>
@@ -86,6 +90,7 @@
             </tableViewCellContentView>
             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
             <connections>
+                <outlet property="activityInd" destination="OOc-29-ykf" id="dL8-Gk-IDE"/>
                 <outlet property="btnAdd" destination="rbo-QQ-Y6s" id="d5r-sk-tmG"/>
                 <outlet property="btnCheck" destination="98P-q3-xLf" id="DuC-go-ION"/>
                 <outlet property="btnDelete" destination="H2v-1x-Sg3" id="lxd-aD-ZUU"/>

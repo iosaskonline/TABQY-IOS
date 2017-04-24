@@ -18,4 +18,5 @@
 @property(weak,nonatomic)IBOutlet UIButton *btnDelete;
 @property(weak,nonatomic)IBOutlet UIImageView *imgLogo;
 @property(weak,nonatomic)IBOutlet UIButton *btnCheck;
+@property(weak,nonatomic)IBOutlet UIActivityIndicatorView *activityInd;
 @end

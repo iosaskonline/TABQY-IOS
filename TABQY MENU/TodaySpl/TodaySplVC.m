@@ -17,6 +17,7 @@
 #import "PlaceOrderVC.h"
 #import "AssociatedFoodObject.h"
 #import "TableAssociatedCell.h"
+#import "SearchFoodVC.h"
 @interface TodaySplVC ()
 {
     NSString *foodIdSelected;
@@ -43,6 +44,7 @@
     self.arraySelectedfoodIdsSave=[[NSMutableArray alloc]init];
     self.arrayAssociated=[[NSMutableArray alloc]init];
     self.arraySelectedAssociatedItem=[[NSMutableArray alloc]init];
+      self.arraySelectedfoodSave=[[NSMutableArray alloc]init];
     
       [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Today's Special",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
@@ -52,7 +54,7 @@
      }];
     // Do any additional setup after loading the view from its nib.
     self.arrayFood=[[NSMutableArray alloc]init];
-    self.arraySelectedfoodSave=[[NSMutableArray alloc]init];
+  
     [self startServiceToGetTodySpl];
 }
 
@@ -112,9 +114,9 @@
         cell.imgFood.image = [UIImage imageNamed:@"Pasted image.png"];
     }
     else{
-        
+        [cell.activityInd startAnimating];
         [cell.imgFood ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-            
+            [cell.activityInd stopAnimating];
         }];
         
     }
@@ -193,9 +195,9 @@
             cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
         }
         else{
-            
+            [cell.activityInd startAnimating];
             [cell.img_view ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-                
+                 [cell.activityInd stopAnimating];
             }];
             
         }
@@ -293,25 +295,7 @@
 
 - (IBAction)clickToAdd:(id)sender {
     
-//    UIButton *btn=(UIButton *)sender;
-//    NSString *strContact=  [NSString stringWithFormat:@"%li",btn.tag];
-//    // BOOL flag=   [_arraySelected containsObject:strContact];
-//    
-//    NSString *strFromInt = [NSString stringWithFormat:@"%d",1];
-//    
-//    
-//    [_arraySelected addObject:strContact];
-//    FoodObject *object=[self.arrayFood objectAtIndex:btn.tag];
-//    
-//    NSInteger a=[object.foodCount intValue];
-//    NSInteger b=[strFromInt intValue];
-//    NSInteger c=a+b;
-//    NSString *st = [NSString stringWithFormat:@"%ld", (long)c];
-//    object.foodCount= st;
-//    
-//    NSLog(@"_arraySelected %@",_arraySelected);
-//    
-//    [self.tblFood reloadData];
+
     
     self.arrayAssociated=[[NSMutableArray alloc]init];
     UIButton *btn=(UIButton *)sender;
@@ -453,7 +437,7 @@
     [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
 
     
-    nav.savedArray=self.arraySelectedfoodSave;
+   // nav.savedArray=self.arraySelectedfoodSave;
     
     
     [self.navigationController pushViewController:nav animated:YES];
@@ -484,7 +468,12 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 /*
 #pragma mark - Navigation
 

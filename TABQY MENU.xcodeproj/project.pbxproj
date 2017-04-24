@@ -120,6 +120,10 @@
 		C5309D8B1EA0F529006AA835 /* TableAssociatedCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C5309D891EA0F529006AA835 /* TableAssociatedCell.m */; };
 		C5309D8C1EA0F529006AA835 /* TableAssociatedCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C5309D8A1EA0F529006AA835 /* TableAssociatedCell.xib */; };
 		C5309D8F1EA1009F006AA835 /* AssociatedFoodObject.m in Sources */ = {isa = PBXBuildFile; fileRef = C5309D8E1EA1009F006AA835 /* AssociatedFoodObject.m */; };
+		C53469A71EAE1E6E0084222A /* SearchFoodVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C53469A51EAE1E6E0084222A /* SearchFoodVC.m */; };
+		C53469A81EAE1E6E0084222A /* SearchFoodVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C53469A61EAE1E6E0084222A /* SearchFoodVC.xib */; };
+		C53469AC1EAE1EA10084222A /* AboutRestaurantVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C53469AA1EAE1EA10084222A /* AboutRestaurantVC.m */; };
+		C53469AD1EAE1EA10084222A /* AboutRestaurantVC.xib in Resources */ = {isa = PBXBuildFile; fileRef = C53469AB1EAE1EA10084222A /* AboutRestaurantVC.xib */; };
 		C539DE641EA5EF120092397B /* OrderTableCell.m in Sources */ = {isa = PBXBuildFile; fileRef = C539DE621EA5EF120092397B /* OrderTableCell.m */; };
 		C539DE651EA5EF120092397B /* OrderTableCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = C539DE631EA5EF120092397B /* OrderTableCell.xib */; };
 		C539DE691EA625AD0092397B /* WaiterProfileVC.m in Sources */ = {isa = PBXBuildFile; fileRef = C539DE671EA625AD0092397B /* WaiterProfileVC.m */; };
@@ -351,6 +355,12 @@
 		C5309D8A1EA0F529006AA835 /* TableAssociatedCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = TableAssociatedCell.xib; sourceTree = "<group>"; };
 		C5309D8D1EA1009F006AA835 /* AssociatedFoodObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AssociatedFoodObject.h; sourceTree = "<group>"; };
 		C5309D8E1EA1009F006AA835 /* AssociatedFoodObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AssociatedFoodObject.m; sourceTree = "<group>"; };
+		C53469A41EAE1E6E0084222A /* SearchFoodVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SearchFoodVC.h; sourceTree = "<group>"; };
+		C53469A51EAE1E6E0084222A /* SearchFoodVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SearchFoodVC.m; sourceTree = "<group>"; };
+		C53469A61EAE1E6E0084222A /* SearchFoodVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = SearchFoodVC.xib; sourceTree = "<group>"; };
+		C53469A91EAE1EA10084222A /* AboutRestaurantVC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AboutRestaurantVC.h; sourceTree = "<group>"; };
+		C53469AA1EAE1EA10084222A /* AboutRestaurantVC.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AboutRestaurantVC.m; sourceTree = "<group>"; };
+		C53469AB1EAE1EA10084222A /* AboutRestaurantVC.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = AboutRestaurantVC.xib; sourceTree = "<group>"; };
 		C539DE611EA5EF120092397B /* OrderTableCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OrderTableCell.h; sourceTree = "<group>"; };
 		C539DE621EA5EF120092397B /* OrderTableCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OrderTableCell.m; sourceTree = "<group>"; };
 		C539DE631EA5EF120092397B /* OrderTableCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = OrderTableCell.xib; sourceTree = "<group>"; };
@@ -850,6 +860,12 @@
 				C5309D801EA0E009006AA835 /* TableItemCell.xib */,
 				C5309D831EA0E365006AA835 /* TableListObject.h */,
 				C5309D841EA0E365006AA835 /* TableListObject.m */,
+				C53469A41EAE1E6E0084222A /* SearchFoodVC.h */,
+				C53469A51EAE1E6E0084222A /* SearchFoodVC.m */,
+				C53469A61EAE1E6E0084222A /* SearchFoodVC.xib */,
+				C53469A91EAE1EA10084222A /* AboutRestaurantVC.h */,
+				C53469AA1EAE1EA10084222A /* AboutRestaurantVC.m */,
+				C53469AB1EAE1EA10084222A /* AboutRestaurantVC.xib */,
 			);
 			path = Table;
 			sourceTree = "<group>";
@@ -998,6 +1014,7 @@
 				C587146C1E9E5639003715B5 /* HotDealTableCell.xib in Resources */,
 				C52253261E96354D009691A5 /* tick_icon_unselected.png in Resources */,
 				C51DF9471E8F93310013136F /* Assets.xcassets in Resources */,
+				C53469AD1EAE1EA10084222A /* AboutRestaurantVC.xib in Resources */,
 				C50BB11C1E9B66B10059C194 /* PlaceOrderVC.xib in Resources */,
 				C539DE6A1EA625AD0092397B /* WaiterProfileVC.xib in Resources */,
 				C51556331E8FCB3E00638667 /* hot_deals.png in Resources */,
@@ -1038,6 +1055,7 @@
 				C5309D821EA0E009006AA835 /* TableItemCell.xib in Resources */,
 				C51556741E8FE85300638667 /* OrderProgressVC.xib in Resources */,
 				C539DE651EA5EF120092397B /* OrderTableCell.xib in Resources */,
+				C53469A81EAE1E6E0084222A /* SearchFoodVC.xib in Resources */,
 				C51556311E8FCB3E00638667 /* feedback.png in Resources */,
 				C51909541E9289E2009F11F7 /* menu_icon2.png in Resources */,
 				C5C249AF1E94D19800FE8B3A /* SegmentedCell.xib in Resources */,
@@ -1132,6 +1150,7 @@
 				C51556171E8FB1DB00638667 /* ECSSocialShare.m in Sources */,
 				C522C20E1E97D4C300A95367 /* UIScrollView+TPKeyboardAvoidingAdditions.m in Sources */,
 				C5BCF4CB1E9534EE00469BA8 /* FoodObject.m in Sources */,
+				C53469A71EAE1E6E0084222A /* SearchFoodVC.m in Sources */,
 				C587146B1E9E5639003715B5 /* HotDealTableCell.m in Sources */,
 				C57D84CE1EA4C484002645F2 /* OrderHistoryTableCell.m in Sources */,
 				C5C249B51E94E13B00FE8B3A /* MenuItemObject.m in Sources */,
@@ -1167,6 +1186,7 @@
 				C5309D8F1EA1009F006AA835 /* AssociatedFoodObject.m in Sources */,
 				C5309D851EA0E365006AA835 /* TableListObject.m in Sources */,
 				C51555F21E8FB12600638667 /* ECSBottomBar.m in Sources */,
+				C53469AC1EAE1EA10084222A /* AboutRestaurantVC.m in Sources */,
 				C522C1F51E97970A00A95367 /* FoodDetailVC.m in Sources */,
 				C52999C21EAA2D1400A516B5 /* AssociatedFoods.m in Sources */,
 				C51556691E8FE7E500638667 /* MenuItemVC.m in Sources */,
@@ -1328,11 +1348,16 @@
 			baseConfigurationReference = 3051CC480C2864EEA6DDA01D /* Pods-TABQY MENU.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "TABQY MENU/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.askonline.TABQY-MENU";
+				PRODUCT_BUNDLE_IDENTIFIER = com.AskOnline;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
@@ -1342,11 +1367,16 @@
 			baseConfigurationReference = D507587CB8AF20D3512BFD27 /* Pods-TABQY MENU.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				DEVELOPMENT_TEAM = "";
 				INFOPLIST_FILE = "TABQY MENU/Info.plist";
 				IPHONEOS_DEPLOYMENT_TARGET = 10.1;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
-				PRODUCT_BUNDLE_IDENTIFIER = "com.askonline.TABQY-MENU";
+				PRODUCT_BUNDLE_IDENTIFIER = com.AskOnline;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;

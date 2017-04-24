@@ -24,6 +24,7 @@
 #import "FeedBackVC.h"
 #import "TodaySplVC.h"
 #import "PlaceOrderVC.h"
+#import "SearchFoodVC.h"
 
 @interface ASK_HomeVC ()
 @property(strong,nonatomic)IBOutlet UIButton *btnMenu;
@@ -61,6 +62,9 @@
     if (self.appUserObject.resturantId) {
         [self startServiceToGetTaxType];
     }
+    
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
 }
 - (void)updateAction:(NSNotification *) notification
 {
@@ -242,7 +246,12 @@
 
 
 
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
 
+}
 
 /*
 #pragma mark - Navigation

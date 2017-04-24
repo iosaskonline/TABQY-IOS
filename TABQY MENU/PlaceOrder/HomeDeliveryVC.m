@@ -13,6 +13,7 @@
 #import "AppUserObject.h"
 #import "ECSServiceClass.h"
 #import "UIExtensions.h"
+#import "SearchFoodVC.h"
 @interface HomeDeliveryVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 @property (weak, nonatomic) IBOutlet TPKeyboardAvoidingScrollView *scroll_addContact;
@@ -136,5 +137,10 @@
     
 }
 
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 @end

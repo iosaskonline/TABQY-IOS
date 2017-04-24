@@ -12,4 +12,5 @@
 {
      NSMutableData *recieveData;
 }
+@property(strong,nonatomic)NSString *addMoreSelectedOrder;
 @end

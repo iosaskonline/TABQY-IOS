@@ -20,6 +20,7 @@
 #import "OrderTableCell.h"
 #import "TableListObject.h"
 #import "MenuItemVC.h"
+#import "SearchFoodVC.h"
 @interface PlaceOrderVC (){
     CGFloat Price;
     CGFloat anotheItemPrice;
@@ -69,9 +70,15 @@
          // [self.activityProfileImage stopAnimating];
      }];
     
-    
+    NSString *tableName=[ECSUserDefault getStringFromUserDefaultForKey:@"tablename"];
+     NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
+    if ([tableName isEqualToString:@""]) {
+          self.lblselectedTable.text=[NSString stringWithFormat:@"Order For table number"];
+    }else{
+         self.lblselectedTable.text=[NSString stringWithFormat:@"Order For table number %@",tableName];
+    }
     self.arrayAssociatedItem=[[NSMutableArray alloc]init];
-    
+    tbleId=tableid;
     [self getOpdatedList];
     [self startServiceToGetAllTable];
 }
@@ -200,9 +207,9 @@
         cell.imgFood.image = [UIImage imageNamed:@"Pasted image.png"];
     }
     else{
-        
+        [cell.activityInd startAnimating];
         [cell.imgFood ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-            
+            [cell.activityInd stopAnimating];
         }];
         
     }
@@ -308,8 +315,10 @@
         tbleId=connectionObject.tableId;
         
         self.lblselectedTable.text=[NSString stringWithFormat:@"Order For table number %@",connectionObject.tableName];
+        [ECSUserDefault saveString:connectionObject.tableName ToUserDefaultForKey:@"tablename"];
+         [ECSUserDefault saveString:connectionObject.tableId ToUserDefaultForKey:@"tableId"];
     }
-    
+   
     self.viewAllTable.hidden=YES;
     [self startServiceToSubmitFoodOrder];
     
@@ -350,17 +359,7 @@
 }
 
 
--(void)removeAllSaveData{
-    NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
-    NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
-    
-    for (int i=0; i<ooldFoodid.count; i++) {
-        NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
-         [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
-    }
-    [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
 
-}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
@@ -422,7 +421,8 @@
         nav.dict=rootDictionary;
         nav.arrayJason=self.arayjsonOrder;
         [self.navigationController pushViewController:nav animated:YES];
-                }
+        
+    }
     else [ECSAlert showAlert:@"Error!"];
     
 }
@@ -433,11 +433,14 @@
 }
 
 -(IBAction)onClickSubmitFoodOrder:(id)sender{
-    self.viewAllTable.frame=CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-    self.viewAllTable.hidden=NO;
-    [self.view addSubview:self.viewAllTable];
     
-    //[self startServiceToSubmitFoodOrder];
+    if ([tbleId isEqualToString:@""]) {
+        self.viewAllTable.frame=CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+        self.viewAllTable.hidden=NO;
+        [self.view addSubview:self.viewAllTable];
+    }else{
+    [self startServiceToSubmitFoodOrder];
+    }
 }
 -(void)startServiceToSubmitFoodOrder
 {
@@ -493,6 +496,13 @@
 //        nav.dict=rootDictionary;
 //        nav.arrayJason=self.arayjsonOrder;
 //        [self.navigationController pushViewController:nav animated:YES];
+        
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Order Successfully"]) {
+            [ECSAlert showAlert:@"Order Successfully"];
+            [self removeAllSaveData];
+        }else{
+            [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
+        }
     }
     else [ECSAlert showAlert:@"Error!"];
     
@@ -547,14 +557,29 @@
 }
 
 
-
+-(void)removeAllSaveData{
+    NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
+    NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
+    
+    for (int i=0; i<ooldFoodid.count; i++) {
+        NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
+        [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
+    }
+    [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
+    [self getOpdatedList];
+}
 
 -(IBAction)onClickMore:(id)sender{
     MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
     [self.navigationController pushViewController:menuVC animated:YES];
 }
 
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 /*
 #pragma mark - Navigation
 

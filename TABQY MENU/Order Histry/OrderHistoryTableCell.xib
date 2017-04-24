@@ -15,7 +15,7 @@
             <rect key="frame" x="0.0" y="0.0" width="732" height="70"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="KGk-i7-Jjw" id="H2p-sc-9uM">
-                <rect key="frame" x="0.0" y="0.0" width="732" height="70"/>
+                <rect key="frame" x="0.0" y="0.0" width="732" height="69.5"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="t3T-vs-oWY">
@@ -69,7 +69,9 @@
                         <state key="normal" title="Details"/>
                     </button>
                 </subviews>
+                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             </tableViewCellContentView>
+            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
             <connections>
                 <outlet property="btnDetail" destination="BWn-qy-gfZ" id="sch-za-Pmz"/>
                 <outlet property="btnFeedback" destination="QRR-qG-FGQ" id="VP6-BH-8DC"/>

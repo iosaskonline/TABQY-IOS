@@ -16,10 +16,12 @@
 #import "MBProgressHUD.h"
 #import "MenuCousineVC.h"
 #import "PlaceOrderVC.h"
+#import "SearchFoodVC.h"
 @interface MenuItemVC (){
     NSMutableArray *arrMenuItem;
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
+@property (weak, nonatomic) IBOutlet UIActivityIndicatorView *activityInd;
 
 @property(weak,nonatomic)IBOutlet UIImageView *menuImage;
 @property(weak,nonatomic)IBOutlet UIImageView *headerImage;
@@ -33,7 +35,8 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     arrMenuItem=[[NSMutableArray alloc]init];
-      [self.viewTop setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
+     // [self.viewTop setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
+     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Menu",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     [self.lblHeader setText:[NSString stringWithFormat:@"%@ Menu",self.appUserObject.resturantName]];
     
     [self.menuCollectionView  registerNib:[UINib nibWithNibName:@"MenuItemCell" bundle:nil]forCellWithReuseIdentifier:@"Cell"];
@@ -43,11 +46,11 @@
         // [self.btnEdit setButtonTitle:@"Upload"];
         
     }else{
-        //http://webdevelopmentreviews.net/resturant/assets/uploads/thumbs/cuisineimage/
+        [self.activityInd startAnimating];
         NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantMenuImage];
         [self.menuImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
-             // [self.activityProfileImage stopAnimating];
+            [self.activityInd stopAnimating];
          }];
         
         
@@ -59,18 +62,20 @@
         // [self.btnEdit setButtonTitle:@"Upload"];
         
     }else{
+        [self.activityInd startAnimating];
         NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
         [self.headerImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
-             // [self.activityProfileImage stopAnimating];
+              [self.activityInd stopAnimating];
          }];
         
         
     }
+    [self.activityInd startAnimating];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
-         // [self.activityProfileImage stopAnimating];
+         [self.activityInd stopAnimating];
      }];
     [self callMenu];
     // Do any additional setup after loading the view from its nib.
@@ -237,8 +242,9 @@
         cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
     }
     else{
-        
+         [cell.activityInd startAnimating];
         [cell.img_view ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
+            [cell.activityInd stopAnimating];
             
         }];
         
@@ -263,6 +269,7 @@
     MenuCousineVC *nav=[[MenuCousineVC alloc]initWithNibName:@"MenuCousineVC" bundle:nil];
     nav.menuId=object.menuId;
     nav.menuName=object.menuName;
+    nav.addMoreSel=self.addMoreSelectedOrder;
     [self.navigationController pushViewController:nav animated:YES];
 //    if ([object.url containsString:@"http"]) {
 //        url =[NSString stringWithFormat:@"%@",object.url];
@@ -296,6 +303,12 @@
 }
 
 
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 
 -(void)clickToPlaceOrderList:(id)sender{
     PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];

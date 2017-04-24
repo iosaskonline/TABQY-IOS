@@ -1,44 +1,40 @@
 //
-//  FeedBackVC.m
+//  AboutRestaurantVC.m
 //  TABQY MENU
 //
-//  Created by ASK ONLINE  on 01/04/17.
+//  Created by ASK ONLINE  on 24/04/17.
 //  Copyright © 2017 ASK ONLINE . All rights reserved.
 //
 
-#import "FeedBackVC.h"
+#import "AboutRestaurantVC.h"
 #import "AppUserObject.h"
-#import "ECSServiceClass.h"
 #import "UIExtensions.h"
-#import "PlaceOrderVC.h"
+#import "ECSServiceClass.h"
+#import "MenuItemVC.h"
+#import "ECSHelper.h"
 #import "SearchFoodVC.h"
-@interface FeedBackVC ()
+#import "MBProgressHUD.h"
+@interface AboutRestaurantVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
+@property(weak,nonatomic)IBOutlet UIImageView *imglogo;
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage;
 @end
 
-@implementation FeedBackVC
+@implementation AboutRestaurantVC
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSString *scrName=[NSString stringWithFormat:@"About %@",self.appUserObject.resturantName];
+    [self settingTopView:self.viewTop onController:self andTitle:scrName andImg:@"arrow-left.png"];
     
-     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Feedback",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
+
     // Do any additional setup after loading the view from its nib.
 }
-
-
--(void)clickToPlaceOrderList:(id)sender{
-    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
-    [self.navigationController pushViewController:nav animated:YES];
-    
-    NSLog(@"placeOrderClicked");
-}
-
 - (void)clickToOpenSearch:(id)sender{
     
     SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];

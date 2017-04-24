@@ -223,7 +223,8 @@
         [request setHTTPBody:body];
     }
     
-    [request setURL:[NSURL URLWithString:[self.serviceURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+[request setURL:[NSURL URLWithString:[self.serviceURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+    
     [self setHeaders:request];
     NSHTTPURLResponse *resp=nil;
     NSError *err = nil;

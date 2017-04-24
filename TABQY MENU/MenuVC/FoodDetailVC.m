@@ -16,6 +16,7 @@
 #import "FoodDetailObject.h"
 #import "FoodRelatedItemObject.h"
 #import "ReletedItemCell.h"
+#import "SearchFoodVC.h"
 //#import "te"
 @interface FoodDetailVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
@@ -176,7 +177,12 @@
     
 }
 
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 
 
 

@@ -17,6 +17,8 @@
 #import "TableListObject.h"
 #import "OrderTableCell.h"
 #import "CompleteOrderVC.h"
+#import "PlaceOrderVC.h"
+#import "SearchFoodVC.h"
 @interface OrderHistryVC ()
 {
     NSString *tbleId;
@@ -196,6 +198,7 @@
 
     if (indexPath.section==0) {
          cell.btnFeedback.hidden=NO;
+        cell.btnDetail.hidden=NO;
          object=[self.arrayOrderProgress objectAtIndex:indexPath.row];
     }else{
          object=[self.arrayCompletedOrder objectAtIndex:indexPath.row];
@@ -316,7 +319,19 @@
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
+-(void)clickToPlaceOrderList:(id)sender{
+    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
+    [self.navigationController pushViewController:nav animated:YES];
+    
+    NSLog(@"placeOrderClicked");
+}
 
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 /*
 #pragma mark - Navigation
 

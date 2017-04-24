@@ -16,6 +16,8 @@
 #import "OrderProgressObject.h"
 #import "TableListObject.h"
 #import "SegmentedCell.h"
+#import "PlaceOrderVC.h"
+#import "SearchFoodVC.h"
 @interface OrderProgressVC ()
 {
     NSIndexPath *inxPath;
@@ -456,6 +458,16 @@
     else [ECSAlert showAlert:@"Error!"];
     
 }
-
-
+-(void)clickToPlaceOrderList:(id)sender{
+    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
+    [self.navigationController pushViewController:nav animated:YES];
+    
+    NSLog(@"placeOrderClicked");
+}
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 @end

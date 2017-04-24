@@ -21,6 +21,8 @@
 #import "TodaySplVC.h"
 #import "TableListVC.h"
 #import "WaiterProfileVC.h"
+#import "ECSHelper.h"
+#import "AboutRestaurantVC.h"
 @interface DS_SideMenuVC ()<UITableViewDelegate,UITableViewDataSource>
 
 {
@@ -307,7 +309,8 @@
         contentScreen = (TableListVC *) [[TableListVC alloc]initWithNibName:@"TableListVC" bundle:nil];
        
     }else if (indexPath.row==1){
-        
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
     }else if (indexPath.row==2){
           contentScreen = (MenuItemVC *) [[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
     }else if (indexPath.row==3){
@@ -321,7 +324,7 @@
     }else if (indexPath.row==7){
         contentScreen = (FeedBackVC *) [[FeedBackVC alloc]initWithNibName:@"FeedBackVC" bundle:nil];
     }else if (indexPath.row==8){
-        contentScreen = (TodaySplVC *) [[TodaySplVC alloc]initWithNibName:@"TodaySplVC" bundle:nil];
+        contentScreen = (AboutRestaurantVC *) [[AboutRestaurantVC alloc]initWithNibName:@"AboutRestaurantVC" bundle:nil];
     }else if (indexPath.row==9){
         contentScreen = (WaiterProfileVC *) [[WaiterProfileVC alloc]initWithNibName:@"WaiterProfileVC" bundle:nil];
     }

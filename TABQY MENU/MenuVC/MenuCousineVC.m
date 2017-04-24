@@ -24,6 +24,8 @@
 #import "PlaceOrderVC.h"
 #import "AssociatedFoodObject.h"
 #import "TableAssociatedCell.h"
+#import "CompleteOrderVC.h"
+#import "SearchFoodVC.h"
 @interface MenuCousineVC ()
 {
     NSMutableArray *arrayCusine;
@@ -793,7 +795,18 @@
 }
 
 -(void)clickToPlaceOrderList:(id)sender{
-    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
+    UIViewController *nav=nil;
+    if (self.addMoreSel.length>1) {
+        // nav=[[CompleteOrderVC alloc]initWithNibName:@"CompleteOrderVC" bundle:nil];
+        CompleteOrderVC *new=[[CompleteOrderVC alloc]init];
+        nav = new;
+        
+        new.selectedOrder=self.addMoreSel;
+    }else{
+      // nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
+        nav = (PlaceOrderVC *) [[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
+    }
+    
   
      NSArray *array=[[NSSet setWithArray:self.arraySelected] allObjects];
     for (int i=0; i<array.count; i++) {
@@ -811,13 +824,18 @@
    
    NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
     [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
-    nav.savedArray=self.arraySelectedfoodSave;
+   // nav.savedArray=self.arraySelectedfoodSave;
 
     [self.navigationController pushViewController:nav animated:YES];
     
    
 }
-
+- (void)clickToOpenSearch:(id)sender{
+    
+    SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
+    [self.navigationController pushViewController:spl animated:YES];
+    
+}
 
 -(void)saveFoodIdwithOldfoodIdList:(NSArray *)oldFoodIdsArr{
       NSLog(@" self.arraySelectedfoodIdsSave %@" ,self.arraySelectedfoodIdsSave);

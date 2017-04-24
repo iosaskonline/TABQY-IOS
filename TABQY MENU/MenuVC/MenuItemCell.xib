@@ -33,6 +33,10 @@
                                 <color key="textColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" fixedFrame="YES" hidesWhenStopped="YES" animating="YES" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="6do-95-aSR">
+                                <rect key="frame" x="110" y="87" width="20" height="20"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            </activityIndicatorView>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     </view>
@@ -40,6 +44,7 @@
             </view>
             <size key="customSize" width="269" height="261"/>
             <connections>
+                <outlet property="activityInd" destination="6do-95-aSR" id="c5I-X2-Xur"/>
                 <outlet property="img_view" destination="1Z9-Qd-yr4" id="mTo-1r-8Ty"/>
                 <outlet property="lblName" destination="LlN-DY-etA" id="S4H-EC-gh8"/>
                 <outlet property="viewBg" destination="oLY-FH-rHF" id="cOq-Ko-3l2"/>
