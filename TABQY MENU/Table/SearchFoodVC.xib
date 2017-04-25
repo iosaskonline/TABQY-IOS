@@ -43,12 +43,19 @@
                         <outlet property="delegate" destination="-1" id="4R8-jx-6h9"/>
                     </connections>
                 </tableView>
-                <searchBar contentMode="redraw" misplaced="YES" id="hKg-Ds-71h">
+                <searchBar contentMode="redraw" misplaced="YES" translucent="NO" id="hKg-Ds-71h">
                     <rect key="frame" x="145" y="100" width="707" height="44"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
                     <color key="backgroundColor" red="0.0" green="0.0" blue="0.0" alpha="0.0" colorSpace="custom" customColorSpace="sRGB"/>
                     <color key="tintColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+                    <color key="barTintColor" red="1" green="0.448131899" blue="0.20107686520000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                    <offsetWrapper key="searchTextPositionAdjustment" horizontal="0.0" vertical="0.0"/>
+                    <offsetWrapper key="searchFieldBackgroundPositionAdjustment" horizontal="0.0" vertical="0.0"/>
                     <textInputTraits key="textInputTraits"/>
+                    <scopeButtonTitles>
+                        <string>Title</string>
+                        <string>Title</string>
+                    </scopeButtonTitles>
                     <connections>
                         <outlet property="delegate" destination="-1" id="2qZ-9B-bwo"/>
                     </connections>

@@ -341,12 +341,6 @@
         
     }
 
-    
-    
-    
-    
-    
-    
     [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
     [self.orderArray removeObjectAtIndex:btn.tag];
     NSMutableArray *storeArray = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
@@ -564,6 +558,19 @@
     for (int i=0; i<ooldFoodid.count; i++) {
         NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
         [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
+        
+        FoodObject *object=[self.orderArray objectAtIndex:i];
+        for (NSDictionary * dictionary in object.associatedFood)
+        {
+            
+            AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
+            NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
+            
+            
+            [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
+            
+        }
+
     }
     [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
     [self getOpdatedList];

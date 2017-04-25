@@ -26,7 +26,9 @@
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
 
-@interface ASK_HomeVC ()
+@interface ASK_HomeVC (){
+    NSString *restaurentId;
+}
 @property(strong,nonatomic)IBOutlet UIButton *btnMenu;
 @property(strong,nonatomic)IBOutlet UIButton *btnSpl;
 @property(strong,nonatomic)IBOutlet UIButton *btnHotDeal;
@@ -59,9 +61,9 @@
      {
          // [self.activityProfileImage stopAnimating];
      }];
-    if (self.appUserObject.resturantId) {
-        [self startServiceToGetTaxType];
-    }
+//    if (self.appUserObject.resturantId) {
+//        [self startServiceToGetTaxType];
+//    }
     
     [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
     [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
@@ -91,6 +93,7 @@
         
     }
     if (userData.resturantId) {
+        restaurentId=userData.resturantId;
         [self startServiceToGetTaxType];
     }
     
@@ -207,7 +210,7 @@
     [class setServiceURL:[NSString stringWithFormat:@"%@tax_management",SERVERURLPATH]];
     
     NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
-                          self.appUserObject.resturantId, @"resturant_id",
+                          restaurentId, @"resturant_id",
                           nil];
     
     [class addJson:dict];

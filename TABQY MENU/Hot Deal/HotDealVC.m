@@ -18,6 +18,7 @@
 #import "TableAssociatedCell.h"
 #import "AssociatedFoodObject.h"
 #import "SearchFoodVC.h"
+#import "FoodDetailVC.h"
 @interface HotDealVC ()
 {
        NSString *foodIdSelected;
@@ -74,7 +75,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     
-    return 170;
+    return 200;
 }
 
 
@@ -220,6 +221,18 @@
 }
 
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    
+    FoodObject*obj=[self.arrayFood objectAtIndex:indexPath.row];
+    FoodDetailVC *nav=[[FoodDetailVC alloc]initWithNibName:@"FoodDetailVC" bundle:nil];
+    nav.foodId=obj.foodId;
+    [self.navigationController pushViewController:nav animated:YES];
+    
+    
+}
+
+
 -(void)startServiceToHotDeal
 {
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
@@ -287,26 +300,7 @@
 
 - (IBAction)clickToAdd:(id)sender {
     
-//    UIButton *btn=(UIButton *)sender;
-//    NSString *strContact=  [NSString stringWithFormat:@"%li",btn.tag];
-//    // BOOL flag=   [_arraySelected containsObject:strContact];
-//    
-//    NSString *strFromInt = [NSString stringWithFormat:@"%d",1];
-//    
-//    
-//    [_arraySelected addObject:strContact];
-//    FoodObject *object=[self.arrayFood objectAtIndex:btn.tag];
-//    
-//    NSInteger a=[object.foodCount intValue];
-//    NSInteger b=[strFromInt intValue];
-//    NSInteger c=a+b;
-//    NSString *st = [NSString stringWithFormat:@"%ld", (long)c];
-//    object.foodCount= st;
-//    
-//    NSLog(@"_arraySelected %@",_arraySelected);
-//    
-//    [self.tblFood reloadData];
-    
+
     
     self.arrayAssociated=[[NSMutableArray alloc]init];
     UIButton *btn=(UIButton *)sender;
@@ -413,16 +407,7 @@
     }else{
         object.foodCount= st;
     }
-    //    }
-    //    else {
-    //        //        ContactObject * connectionObject = [self.arrayContacts objectAtIndex:btn.tag];
-    //        //
-    //        //        [self serviceToDeleteMember:connectionObject.contactId.stringValue];
-    //       // [_arraySelected removeObject:strContact];
-    //
-    //
-    //
-    //    }
+    
     NSLog(@"_arraySelected %@",_arraySelected);
     
     [self.tblFood reloadData];

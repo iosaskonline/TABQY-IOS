@@ -18,6 +18,7 @@
 #import "TableAssociatedCell.h"
 #import "PlaceOrderVC.h"
 #import "AssociatedFoodObject.h"
+#import "FoodDetailVC.h"
 @interface SearchFoodVC ()
 {
        NSString *foodIdSelected;
@@ -58,22 +59,17 @@
          // [self.activityProfileImage stopAnimating];
      }];
     self.searchBar.backgroundColor = [UIColor whiteColor];
-    
-    self.searchBar.barTintColor = [UIColor whiteColor];
+//    
+   // self.searchBar.barTintColor = [UIColor whiteColor];
     self.searchBar.tintColor = [UIColor blueColor];
     
     self.searchBar.placeholder=@"  Search Food...  ";
+    self.searchBar.frame = CGRectMake(self.searchBar.frame.origin.x,self.searchBar.frame.origin.y, self.searchBar.frame.size.width, 50);
     // self.searchBar.tableHeaderView = self.headerView;
     //[ self.searchBar setImage:[UIImage imageNamed:@"Search-icon.png"]
       //       forSearchBarIcon:UISearchBarIconSearch
           //              state:UIControlStateNormal];
     
-    
-    
-    
-// [self.view insertSubview:self.tableView belowSubview:self.contactPickerView];
-// self.tblFood.tableHeaderView=self.headerView;
-// Do any additional setup after loading the view from its nib.
 }
 
 
@@ -119,6 +115,7 @@
         // self.filteredContacts = self.contacts;
     }
     self.searchBar.showsCancelButton = NO;
+     [self startServiceToSearchFood];
     [self.searchBar resignFirstResponder];
     [self.tblFood reloadData];
 }
@@ -187,7 +184,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     
-    return 170;
+    return 200;
 }
 
 
@@ -265,7 +262,7 @@
         }
         
         
-        [cell.imgLogo setImage:[UIImage imageNamed:@"todays_special_icon.png"] ];
+        cell.imgLogo.hidden=YES;
         cell.btnAdd.tag=indexPath.row;
         cell.btnDelete.tag=indexPath.row;
         if (object.foodCount.length) {
@@ -461,7 +458,16 @@
     
     [self.tblFood reloadData];
 }
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    
+           FoodObject*obj=[self.foodArray objectAtIndex:indexPath.row];
+        FoodDetailVC *nav=[[FoodDetailVC alloc]initWithNibName:@"FoodDetailVC" bundle:nil];
+        nav.foodId=obj.foodId;
+        [self.navigationController pushViewController:nav animated:YES];
 
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

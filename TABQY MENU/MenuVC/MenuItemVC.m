@@ -62,20 +62,20 @@
         // [self.btnEdit setButtonTitle:@"Upload"];
         
     }else{
-        [self.activityInd startAnimating];
+       // [self.activityInd startAnimating];
         NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
         [self.headerImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
-              [self.activityInd stopAnimating];
+              //[self.activityInd stopAnimating];
          }];
         
         
     }
-    [self.activityInd startAnimating];
+   // [self.activityInd startAnimating];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
-         [self.activityInd stopAnimating];
+         //[self.activityInd stopAnimating];
      }];
     [self callMenu];
     // Do any additional setup after loading the view from its nib.

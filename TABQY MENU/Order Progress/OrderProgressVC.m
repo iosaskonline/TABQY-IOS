@@ -18,7 +18,7 @@
 #import "SegmentedCell.h"
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
-@interface OrderProgressVC ()
+@interface OrderProgressVC ()<UIActionSheetDelegate>
 {
     NSIndexPath *inxPath;
     NSString *tableId;
@@ -32,6 +32,8 @@
 @property(strong,nonatomic)NSMutableArray *arrayOrderProgress;
 @property(strong,nonatomic)NSMutableArray *arraySelectedTable;
 @property(strong,nonatomic)NSMutableArray *arraySelectedIndex;
+@property(strong,nonatomic)NSMutableDictionary *dictFood;
+@property(strong,nonatomic)NSMutableArray *arrorderFood;
 
 @property (weak, nonatomic) IBOutlet UICollectionView *segmentedCollectionView;
 
@@ -51,21 +53,6 @@
          // [self.activityProfileImage stopAnimating];
      }];
    
-//    for (int i=0; i<500; i++) {
-//        
-//        NSString *key=[NSString stringWithFormat:@"GetSelectedTable%d",i];
-//        NSData *data=[ECSUserDefault getObjectFromUserDefaultForKey:key];
-//        if (data) {
-//            
-//            TableListObject *obj=[NSKeyedUnarchiver unarchiveObjectWithData:data];
-//            [self.arraySelectedTable addObject:obj];
-//        }
-//        
-//    }
-//      [self.segmentedCollectionView setPagingEnabled:YES];
-//    [self.arraySelectedIndex addObject:@"0"];
-//     NSLog(@"Selected Tables%@",self.arraySelectedTable);
-//    [self.segmentedCollectionView reloadData];
    
     [self startServiceToGetOrdertable];
 }
@@ -360,6 +347,9 @@
         self.arrayOrderProgress=[[NSMutableArray alloc]init];
         // self.arrayCompletedOrder=[[NSMutableArray alloc]init];
         NSArray *arr=[rootDictionary valueForKey:@"order_progess"];
+         self.dictFood=[rootDictionary valueForKey:@"food_orders_name"];
+      
+        
         for (NSDictionary * dictionary in arr)
         {
             
@@ -419,7 +409,10 @@
     {
           [self.arraySelectedIndex addObject:@"0"];
         self.arrayOrderProgress=[[NSMutableArray alloc]init];
-       
+        if ([[rootDictionary objectForKey:@"msg"]isEqualToString:@"No Order in progress."]) {
+           // [ECSAlert showAlert:@"No Order in progress."];
+           // return ;
+        }
         NSArray *arr=[rootDictionary valueForKey:@"waitertable"];
             for (NSDictionary * dictionary in arr)
             {
@@ -468,6 +461,29 @@
     
     SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
     [self.navigationController pushViewController:spl animated:YES];
+    
+}
+
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath
+{
+       //self.dictFood=[rootDictionary valueForKey:@"food_orders_name"];
+    self.arrorderFood=[[NSMutableArray alloc]init];
+    
+    OrderProgressObject *object=[self.arrayOrderProgress objectAtIndex:indexPath.row];
+    
+    self.arrorderFood=[self.dictFood objectForKey:object.order_no];
+    
+    NSLog(@"foodlist=  %@",self.arrorderFood);
+    UIActionSheet *actionSheet = [[UIActionSheet alloc]initWithTitle:@"Ordered Items"
+                                                             delegate:self
+                                                    cancelButtonTitle:@"Cancel"
+                                               destructiveButtonTitle:nil
+                                                    otherButtonTitles:nil];
+    for (NSString *title in [self.arrorderFood valueForKey:@"name"]) {
+        [actionSheet addButtonWithTitle:title];
+    }
+
+    [actionSheet showInView:self.view];
     
 }
 @end

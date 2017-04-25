@@ -42,43 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "TABQY MENU/PlaceOrder/CompleteOrderVC.m"
-            timestampString = "514733298.873655"
+            timestampString = "514814671.411714"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "454"
-            endingLineNumber = "454"
-            landmarkName = "@implementation CompleteOrderVC"
-            landmarkType = "3">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TABQY MENU/PlaceOrder/CompleteOrderVC.m"
-            timestampString = "514733298.873655"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "525"
-            endingLineNumber = "525"
-            landmarkName = "-serviceToSubmitFoodOrder"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "TABQY MENU/PlaceOrder/CompleteOrderVC.m"
-            timestampString = "514733298.873655"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "536"
-            endingLineNumber = "536"
+            startingLineNumber = "533"
+            endingLineNumber = "533"
             landmarkName = "-callBackServiceToSubmitFoodOrder:"
             landmarkType = "7">
          </BreakpointContent>

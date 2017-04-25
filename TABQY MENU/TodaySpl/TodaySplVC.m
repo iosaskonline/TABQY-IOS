@@ -18,6 +18,7 @@
 #import "AssociatedFoodObject.h"
 #import "TableAssociatedCell.h"
 #import "SearchFoodVC.h"
+#import "FoodDetailVC.h"
 @interface TodaySplVC ()
 {
     NSString *foodIdSelected;
@@ -72,7 +73,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     
-    return 170;
+    return 200;
 }
 
 
@@ -224,6 +225,16 @@
 }
 
 
+- (void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
+    
+    
+    FoodObject*obj=[self.arrayFood objectAtIndex:indexPath.row];
+    FoodDetailVC *nav=[[FoodDetailVC alloc]initWithNibName:@"FoodDetailVC" bundle:nil];
+    nav.foodId=obj.foodId;
+    [self.navigationController pushViewController:nav animated:YES];
+    
+    
+}
 
 
 

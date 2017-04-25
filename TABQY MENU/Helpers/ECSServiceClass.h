@@ -15,6 +15,8 @@
 #define CousineImage            @"http://webdevelopmentreviews.net/resturant/assets/uploads/thumbs/cuisineimage/"
 #define FOODIMAGE              @"http://webdevelopmentreviews.net/resturant/assets/uploads/foodimage/"
 #define RESTORENTBGIMAGE          @"http://webdevelopmentreviews.net/resturant/assets/uploads/backgroundimage/"
+#define TEAMIMG                 @"http://webdevelopmentreviews.net/resturant/assets/uploads/empimage/"
+#define RESTAURANTIMG           @"http://webdevelopmentreviews.net/resturant/assets/uploads/resturantimage/"
 #define AUTH_TOKEN             @"X-AUTH-TOKEN"
 #define APP_KEY                @"X-APP-KEY"
 #define DEVICE_ID              @"X-DEVICE-ID"

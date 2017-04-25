@@ -36,6 +36,10 @@
     NSString *taxPrice;
     NSString *tbleId;
     NSString *orderNumber;
+    
+    CGFloat assoPrice;
+    CGFloat preAssoPrice;
+    NSString *subtotal;
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 
@@ -81,10 +85,14 @@
     
 
     
-    if (self.orderObj.tableId.length) {
+    if (self.orderObj.tableId.length||self.orderObj.orderNum.length) {
         tbleId=self.orderObj.tableId;
         orderNumber= self.orderObj.orderNum;
+        if ([self.orderObj.tableName isEqualToString:@""]) {
+              self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",@"home develiry"];
+        }else{
          self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",self.orderObj.tableName];
+        }
     }else{
         NSString *tableName=[ECSUserDefault getStringFromUserDefaultForKey:@"tablename"];
         NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
@@ -116,6 +124,8 @@
     Price=0;
     anotheItemPrice=0;
     vatPrice=0;
+    preAssoPrice=0;
+    assoPrice=0;
     self.arayjsonOrder=[[NSMutableArray alloc]init];
     NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
     NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
@@ -142,8 +152,12 @@
                     [dictAssociate setValue:associatedFoodObject.associatedFoodCode forKey:@"asscioted_food_code"];
                     [dictAssociate setValue:associatedFoodObject.associatedFoodPrice forKey:@"asscioted_price"];
                     [dictAssociate setValue:@"1" forKey:@"asscioted_qty"];
-                    
+                    preAssoPrice=associatedFoodObject.associatedFoodPrice.floatValue;
+                    assoPrice=preAssoPrice+assoPrice;
+                    preAssoPrice=0;
                     [self.arrayAssociatedItem addObject:dictAssociate];
+                    
+                   
                 }
             }
             
@@ -165,7 +179,7 @@
             NSLog(@"self.arayjsonOrder= %@",self.arayjsonOrder);
             anotheItemPrice=[obj.price floatValue];
             anotheItemPrice=anotheItemPrice*[obj.foodCount integerValue];
-            Price=Price+anotheItemPrice;
+            Price=Price+anotheItemPrice+assoPrice;
             
         }
         
@@ -183,9 +197,9 @@
     taxPrice=[NSString stringWithFormat:@"%.2f",vatPrice];
     vatPricetotal=[NSString stringWithFormat:@"%.2f",vatPrice];
    // self.lblPreviousTotalPrice.text=[NSString stringWithFormat:@"Previous total price :    %@",@"INR 0.00"];
-    self.lblOngoingTotalPrice.text=[NSString stringWithFormat:@"Ongoing total price :   INR %.2f",Price];
-    self.lblVatTotalPrice.text=[NSString stringWithFormat:@"%@ %@%@ :       INR %.2f",taxname,taxVal,@"%",vatPrice];
-    self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total payable price :    %.2f",Price+vatPrice];
+    self.lblOngoingTotalPrice.text=[NSString stringWithFormat:@"Ongoing total price :   %@ %.2f",self.appUserObject.resturantCurrency,Price];
+    self.lblVatTotalPrice.text=[NSString stringWithFormat:@"%@ %@%@ :   %@ %.2f",taxname,taxVal,@"%",self.appUserObject.resturantCurrency,vatPrice];
+    self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total payable price :   %@ %.2f",self.appUserObject.resturantCurrency,Price+vatPrice+[subtotal floatValue]];
     [self.tblOrder reloadData];
     
 }
@@ -251,78 +265,64 @@
         
         NSString *associatedFoodNames=@"";
          NSString *associatedFoodNames2=@"";
-        for (NSDictionary * dictionary in object.associatedFood)
-        {
-            
-            AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
-           
-            NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
-            NSString *associatedItem=[ECSUserDefault getObjectFromUserDefaultForKey:strForKey];
-          
-            if ([associatedItem isEqualToString:@"selected"]) {
-                if ([associatedFoodNames isEqualToString:@""]) {
-                    assoPreviousItemPrice=associatedFoodObject.associatedFoodPrice.floatValue ;
-                    assoItemPrice=assoPreviousItemPrice+assoItemPrice;
-                    assoPreviousItemPrice=0;
-                    associatedFoodNames=[NSString stringWithFormat:@"%@",associatedFoodObject.associatedFoodName];
-                }else{
-                    assoPreviousItemPrice=associatedFoodObject.associatedFoodPrice.floatValue ;
-                    assoItemPrice=assoPreviousItemPrice+assoItemPrice;
-                    assoPreviousItemPrice=0;
+        cell.lblassociatedItem.hidden=YES;
+        cell.txtassociatedItem.hidden=YES;
+            for (NSDictionary * dictionary in object.associatedFood)
+            {
+                
+                AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
+                
+                NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
+                NSString *associatedItem=[ECSUserDefault getObjectFromUserDefaultForKey:strForKey];
+                
+                if ([associatedItem isEqualToString:@"selected"]) {
+                    if ([associatedFoodNames isEqualToString:@""]) {
+                        assoPreviousItemPrice=associatedFoodObject.associatedFoodPrice.floatValue ;
+                        assoItemPrice=assoPreviousItemPrice+assoItemPrice;
+                        assoPreviousItemPrice=0;
+                        associatedFoodNames=[NSString stringWithFormat:@"%@",associatedFoodObject.associatedFoodName];
+                        [cell.txtassociatedItem setText:associatedFoodNames];
+                    }else{
+                        assoPreviousItemPrice=associatedFoodObject.associatedFoodPrice.floatValue ;
+                        assoItemPrice=assoPreviousItemPrice+assoItemPrice;
+                        assoPreviousItemPrice=0;
+                        
+                        associatedFoodNames=[NSString stringWithFormat:@"%@,%@",associatedFoodNames,associatedFoodObject.associatedFoodName];
+                        [cell.txtassociatedItem setText:associatedFoodNames];
+                        
+                    }
                     
-                    associatedFoodNames=[NSString stringWithFormat:@"%@,%@",associatedFoodNames,associatedFoodObject.associatedFoodName];
+                }else{
+                    AssociatedFoods *associatedfood=[AssociatedFoods instanceFromDictionary:dictionary];
+                    if (associatedfood.associatedFoodName.length) {
+                        if ([associatedFoodNames2 isEqualToString:@""]) {
+                            assoPreviousItemPrice=associatedfood.associatedFoodPrice.floatValue ;
+                            assoItemPrice=assoPreviousItemPrice+assoItemPrice;
+                            assoPreviousItemPrice=0;
+                            associatedFoodNames2=[NSString stringWithFormat:@"%@",associatedfood.associatedFoodName];
+                            [cell.txtassociatedItem setText:associatedFoodNames2];
+                        }else{
+                            assoPreviousItemPrice=associatedfood.associatedFoodPrice.floatValue ;
+                            assoItemPrice=assoPreviousItemPrice+assoItemPrice;
+                            assoPreviousItemPrice=0;
+                            associatedFoodNames2=[NSString stringWithFormat:@"%@,%@",associatedFoodNames2,associatedfood.associatedFoodName];
+                            [cell.txtassociatedItem setText:associatedFoodNames2];
+                        }
+                        
+                    }
+                    
                     
                 }
-                 [cell.txtassociatedItem setText:associatedFoodNames];
-            }else{
-            AssociatedFoods *associatedfood=[AssociatedFoods instanceFromDictionary:dictionary];
-            if (associatedfood.associatedFoodName.length) {
-                if ([associatedFoodNames2 isEqualToString:@""]) {
-                    assoPreviousItemPrice=associatedfood.associatedFoodPrice.floatValue ;
-                    assoItemPrice=assoPreviousItemPrice+assoItemPrice;
-                    assoPreviousItemPrice=0;
-                    associatedFoodNames2=[NSString stringWithFormat:@"%@",associatedfood.associatedFoodName];
-                }else{
-                    assoPreviousItemPrice=associatedfood.associatedFoodPrice.floatValue ;
-                    assoItemPrice=assoPreviousItemPrice+assoItemPrice;
-                    assoPreviousItemPrice=0;
-                    associatedFoodNames2=[NSString stringWithFormat:@"%@,%@",associatedFoodNames2,associatedfood.associatedFoodName];
-                    
-                }
-                 [cell.txtassociatedItem setText:associatedFoodNames2];
-            }
-               
-
-}
-            
-            cell.lblassociatedItem.hidden=NO;
+                
+                cell.lblassociatedItem.hidden=NO;
                 cell.txtassociatedItem.hidden=NO;
-//            if (associatedFoodNames2.length>0) {
-//                [cell.txtassociatedItem setText:associatedFoodNames2];
-//            }else
-//            {
-//                [cell.txtassociatedItem setText:associatedFoodNames];
-//            }
-        }
-        
+                
+            }
+            
         CGFloat totalrice=assoItemPrice+object.price.floatValue;
   
         cell.lblFoodprice.text=[NSString stringWithFormat:@"%@ %.2f",self.appUserObject.resturantCurrency,totalrice];
         assoItemPrice=0;
-        if (associatedFoodNames.length) {
-            cell.lblassociatedItem.hidden=NO;
-            cell.txtassociatedItem.hidden=NO;
-        }else{
-            cell.lblassociatedItem.hidden=YES;
-            cell.txtassociatedItem.hidden=YES;
-        }
-        if (associatedFoodNames2.length) {
-            cell.lblassociatedItem.hidden=NO;
-            cell.txtassociatedItem.hidden=NO;
-        }else{
-            cell.lblassociatedItem.hidden=YES;
-            cell.txtassociatedItem.hidden=YES;
-        }
         NSLog(@"new %@",object.foodCount);
         cell.btnCancel.tag=indexPath.row;
         if (object.foodqty.length) {
@@ -501,9 +501,6 @@
     
     [class setServiceURL:[NSString stringWithFormat:@"%@re_food_orders",SERVERURLPATH]];
     
-    // {"user_id": "23","table_id": "19","resturant_id": "4","type": "2","status": "0","order_no": "Al Ja-11-2","total_price":"450","sales_tax":"9.4","service_tax":"8.46","payable_amount":"111.8","orders": [{"food_id": "5","name": "Hakka Noodles","food_code": "noodles1","qty": "2","price": "25","items": [{"asscioted_food_id": "1","asscioted_food_name": "Curd-2","asscioted_food_code": "co-123","asscioted_qty": 2,"asscioted_price": "40" }, {"asscioted_food_id": "3","asscioted_food_name": "Ratias","asscioted_food_code": "ra-124","asscioted_qty": 1,"asscioted_price": 0}]}]}
-    
-    
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.resturantId, @"resturant_id",
                                  self.appUserObject.user_id, @"user_id",
@@ -536,9 +533,15 @@
     NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
     if(response.isValid)
     {
-        if ([rootDictionary objectForKey:@"msg"]) {
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Order Successfully"]) {
             [self removeAllSaveData];
-            [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
+            [ECSAlert showAlert:@"Order Successfully Completed."];
+            [self.navigationController popToRootViewControllerAnimated:YES];
+        }else if([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Table Id is Missing"]){
+             [ECSAlert showAlert:@"Table Id is Missing!"];
+        }
+        else{
+            [ECSAlert showAlert:@"You have not added any On Going order!"];
         }
     }
     else [ECSAlert showAlert:@"Error!"];
@@ -636,7 +639,7 @@
             
             [self.orderArray addObject:object];
         }
-        NSString *subtotal=[rootDictionary valueForKey:@"sub_total"];
+        subtotal=[rootDictionary valueForKey:@"sub_total"];
         CGFloat total=Price+vatPrice+[subtotal floatValue];
         self.lblPreviousTotalPrice.text=[NSString stringWithFormat:@"Previous total price :    %@ %.2f",self.appUserObject.resturantCurrency,[subtotal floatValue]];
         
@@ -699,6 +702,7 @@
     if(response.isValid)
     {
         if ([rootDictionary objectForKey:@"msg"]) {
+             [self.navigationController popToRootViewControllerAnimated:YES];
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
         
@@ -744,6 +748,7 @@
     if(response.isValid)
     {
         if ([rootDictionary objectForKey:@"msg"]) {
+             [self.navigationController popToRootViewControllerAnimated:YES];
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
@@ -765,9 +770,15 @@
 -(IBAction)onClickMore:(id)sender{
     MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
     menuVC.addMoreSelectedOrder=self.orderObj.orderNum;
-
-    [ECSUserDefault saveString:self.orderObj.tableName ToUserDefaultForKey:@"tablename"];
-     [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
+    if (self.orderObj.tableName.length) {
+        [ECSUserDefault saveString:self.orderObj.tableName ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
+    }else{
+//        [ECSUserDefault saveString:[ECSUserDefault get] ToUserDefaultForKey:@"tablename"];
+//        [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
+    }
+    
+   
     [self.navigationController pushViewController:menuVC animated:YES];
 }
 -(void)removeAllSaveData{
@@ -777,8 +788,24 @@
     for (int i=0; i<ooldFoodid.count; i++) {
         NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
         [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
+         FoodObject *object=[self.orderArray objectAtIndex:i];
+        for (NSDictionary * dictionary in object.associatedFood)
+        {
+            
+            AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
+            NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
+            
+            
+            [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
+            
+        }
+        
+        
     }
     [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
+    
+   
+
     [self getOpdatedList];
 }
 - (void)clickToOpenSearch:(id)sender{

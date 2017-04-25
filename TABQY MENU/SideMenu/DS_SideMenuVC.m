@@ -259,15 +259,16 @@
     
     if(flag == NO )
     {
-        //MenuItemObject * connectionObject = [itemArray objectAtIndex:indexPath.row];;
-        
-         [cell.imgCatergory setImage:[UIImage imageNamed:obj.image]];
-        
+        [cell.imgCatergory setImage:[UIImage imageNamed:obj.image]];
+        cell.lbl_sidemenuLabel.textColor=[UIColor whiteColor];
+        cell.backgroundColor=[JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0];
     }
     else {
         
         
           [cell.imgCatergory setImage:[UIImage imageNamed:[imgArrayList objectAtIndex:indexPath.row]]];
+       //  cell.lbl_sidemenuLabel.textColor=[JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0];
+         cell.backgroundColor=[JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0];
     }
     
    // cell.btnCheck.tag=indexPath.row;
@@ -343,34 +344,6 @@
 
 }
 
--(IBAction)onClickProfile:(id)sender{
-//      UIViewController * contentScreen = nil;
-//    [self.sideMenuController closeMenu];
-//    
-//    
-//    contentScreen =[[BC_ProfileVC alloc]initWithNibName:@"BC_ProfileVC" bundle:nil];
-//    [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
-}
--(IBAction)onClickLogout:(id)sender{
-//    UIViewController * contentScreen = nil;
-//    [self.sideMenuController closeMenu];
-//    [AppUserObject removeFromUserDefault];
-//    
-//    ALRegisterUserClientService * alUserClientService = [[ALRegisterUserClientService alloc]init];
-//    [alUserClientService logoutWithCompletionHandler:^{
-//        
-//        
-//        
-//    }];
-//    //DS_LaunchScreen
-//    //contentScreen = (CH_LoginVC *) [[CH_LoginVC alloc]initWithNibName:@"CH_LoginVC" bundle:nil];
-//  contentScreen = (DS_LaunchScreen *) [[DS_LaunchScreen alloc]initWithNibName:@"DS_LaunchScreen" bundle:nil];
-//    if(contentScreen){
-//        [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
-//        
-//    }
-
-}
 
 @end
 
