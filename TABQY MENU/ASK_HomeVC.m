@@ -28,6 +28,7 @@
 
 @interface ASK_HomeVC (){
     NSString *restaurentId;
+   
 }
 @property(strong,nonatomic)IBOutlet UIButton *btnMenu;
 @property(strong,nonatomic)IBOutlet UIButton *btnSpl;
@@ -59,29 +60,20 @@
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
-         // [self.activityProfileImage stopAnimating];
+         
      }];
-//    if (self.appUserObject.resturantId) {
-//        [self startServiceToGetTaxType];
-//    }
-    
-    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
-    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+
 }
 - (void)updateAction:(NSNotification *) notification
 {
-    NSLog(@"fdgfgrf%@",notification.object);
+    //NSLog(@"fdgfgrf%@",notification.object);
     AppUserObject *userData=notification.object;
     NSString *scrName=[NSString stringWithFormat:@"%@ Dashbord",userData.resturantName];
     [self settingTopView:self.viewTop onController:self andTitle:scrName andImg:@"nav_header_icon.png"];
-//    [self.viewTop setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
-//    
-//    //http://webdevelopmentreviews.net/resturant/assets/uploads/thumbs/resturantlogo/restaurant-logo-template_23-2147510426.jpg
-//    
-//    
+
     if (userData.resturantBgImage ==(id)[NSNull null] ||[userData.resturantBgImage isEqualToString:@""]) {
         NSLog(@"ttt %@",self.appUserObject.resturantLogo);
-        // [self.btnEdit setButtonTitle:@"Upload"];
+        
         
     }else{
         NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,userData.resturantBgImage];
@@ -125,13 +117,14 @@
     
 }
 -(void)openSideMenuButtonClicked:(UIButton *)sender{
-   // self.view.frame=CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
-   // self.view.backgroundColor=[UIColor darkGrayColor];
+  
     MVYSideMenuController *sideMenuController = [self sideMenuController];
     //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
     if (sideMenuController) {
-        [sideMenuController openMenu];
+    
+         [sideMenuController openMenu];
     }
     
 }
@@ -256,6 +249,35 @@
 
 }
 
+
+-(void)createPDFfromUIView:(UIView*)aView saveToDocumentsWithFileName:(NSString*)aFilename
+{
+    // Creates a mutable data object for updating with binary data, like a byte array
+    NSMutableData *pdfData = [NSMutableData data];
+    
+    // Points the pdf converter to the mutable data object and to the UIView to be converted
+    UIGraphicsBeginPDFContextToData(pdfData, aView.bounds, nil);
+    UIGraphicsBeginPDFPage();
+    CGContextRef pdfContext = UIGraphicsGetCurrentContext();
+    
+    
+    // draws rect to the view and thus this is captured by UIGraphicsBeginPDFContextToData
+    
+    [aView.layer renderInContext:pdfContext];
+    
+    // remove PDF rendering context
+    UIGraphicsEndPDFContext();
+    
+    // Retrieves the document directories from the iOS device
+    NSArray* documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask,YES);
+    
+    NSString* documentDirectory = [documentDirectories objectAtIndex:0];
+    NSString* documentDirectoryFilename = [documentDirectory stringByAppendingPathComponent:aFilename];
+    
+    // instructs the mutable data object to write its context to a file on disk
+    [pdfData writeToFile:documentDirectoryFilename atomically:YES];
+    NSLog(@"documentDirectoryFileName: %@",documentDirectoryFilename);
+}
 /*
 #pragma mark - Navigation
 

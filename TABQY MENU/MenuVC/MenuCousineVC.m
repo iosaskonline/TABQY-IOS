@@ -465,10 +465,10 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if (tableView==_tblFood) {
-        return 145;
+        return 170;
     }
    else if (tableView==self.tblAssociatedItems) {
-        return 145;
+        return 160;
     }
     else
     return 60;
@@ -484,7 +484,7 @@
         [self.tblFood registerNib:[UINib nibWithNibName:@"MenuFoodCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
         MenuFoodCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        [self.tblCousine setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        [self.tblFood setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         cell.backgroundColor = [UIColor clearColor];
         FoodObject *object=[self.arrayFood objectAtIndex:indexPath.row];
         
@@ -573,7 +573,7 @@
         [self.tblAssociatedItems registerNib:[UINib nibWithNibName:@"TableAssociatedCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
         TableAssociatedCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
-        [self.tblCousine setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+        [self.tblAssociatedItems setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         cell.backgroundColor = [UIColor clearColor];
         AssociatedFoodObject *object=[self.arrayAssociated objectAtIndex:indexPath.row];
         
@@ -590,9 +590,9 @@
             cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
         }
         else{
-            
+            [cell.activityInd startAnimating];
             [cell.img_view ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
-                
+                 [cell.activityInd stopAnimating];
             }];
             
         }

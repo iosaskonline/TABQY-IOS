@@ -552,6 +552,10 @@
 
 
 -(void)removeAllSaveData{
+    
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    
     NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
     NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
     

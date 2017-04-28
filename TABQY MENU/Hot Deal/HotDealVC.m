@@ -75,7 +75,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     
-    return 200;
+    return 180;
 }
 
 
@@ -133,15 +133,10 @@
     BOOL flag=   [_arraySelected containsObject:
                   [NSString stringWithFormat:@"%li",indexPath.row]];
     
-    
-    
-    
-    
+ 
     if(flag == NO )
     {
-        
-        
-        
+
         [cell.btnCheck setImage:[UIImage imageNamed:@"tick_icon_unselected.png"] forState:UIControlStateNormal];
        
     }
@@ -150,9 +145,6 @@
         [cell.btnCheck setImage:[UIImage imageNamed:@"tick_icon.png"] forState:UIControlStateNormal];
         
     }
-    
-    
-    
     cell.btnAdd.tag=indexPath.row;
     cell.btnDelete.tag=indexPath.row;
     if (object.foodCount.length) {

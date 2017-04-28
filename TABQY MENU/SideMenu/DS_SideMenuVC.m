@@ -31,6 +31,9 @@
     NSString *selectedcell;
     NSArray *itemArray;
     NSMutableArray *selectedIndex;
+    
+    NSString *sideBarColor;
+    NSString *sideBarActiveColor;
 }
 //@property (weak, nonatomic) IBOutlet UICollectionView *Contacts_CollectionView;
 
@@ -114,21 +117,7 @@
     logout.image=@"log_out_icon.png";
 
    itemArray = [NSArray arrayWithObjects:table, dashbord,menu,spl,hDeal,orderProgress,oHistry,feedBack,about,profile,logout, nil];
-    
-//    [self.slidemenuArray addObject:@"Table"];
-//      [self.slidemenuArray addObject:@"Dashbord"];
-//      [self.slidemenuArray addObject:@"Menu"];
-//      [self.slidemenuArray addObject:@"Today’s Special"];
-//      [self.slidemenuArray addObject:@"Hot Deal"];
-//      [self.slidemenuArray addObject:@"Order in Progress"];
-//      [self.slidemenuArray addObject:@"Order Histry"];
-//      [self.slidemenuArray addObject:@"FeedBack"];
-//      [self.slidemenuArray addObject:@"About Restaurant"];
-//      [self.slidemenuArray addObject:@"My Profile"];
-//    [self.slidemenuArray addObject:@"Logout"];
-//    
-//  
-//    
+
     [imgArrayList addObject:@"table_icon_hover-1.png"];
     [imgArrayList addObject:@"dashboard_icon_hover.png"];
     [imgArrayList addObject:@"menu_icon_hover.png"];
@@ -145,13 +134,31 @@
     self.sideMenuTable.dataSource=self;
     [super viewDidLoad];
     
-
-    
+    sideBarColor=self.appUserObject.sidebarColor;
+    sideBarActiveColor=self.appUserObject.sidebarActiveColor;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(updateActionSideMenu:)
+                                                 name:@"LoginUpdateForSidemenu"
+                                               object:nil];
    
 }
 
 
 
+- (void)updateActionSideMenu:(NSNotification *) notification
+{
+    //NSLog(@"fdgfgrf%@",notification.object);
+    AppUserObject *userData=notification.object;
+   // NSString *scrName=[NSString stringWithFormat:@"%@ Dashbord",userData.resturantName];
+    
+    NSLog(@" test==%@ ",userData.sidebarColor);
+    NSLog(@" testActive==%@ ",userData.sidebarActiveColor);
+    sideBarColor=userData.sidebarColor;
+    sideBarActiveColor=userData.sidebarActiveColor;
+    [self.sideMenuTable reloadData];
+   // [JKSColor colorwithHexString:userData.sidebarActiveColor alpha:1.0];
+    
+  }
 
 
 
@@ -194,21 +201,8 @@
     //self.view.frame=CGRectMake(0, 0, 290, self.view.frame.size.height);
 }
 -(void)viewWillAppear:(BOOL)animated {
-   // nameArrayList=[[NSMutableArray alloc]init];
-//    self.view.frame=CGRectMake(0, 0, 290, self.view.frame.size.height);
-//    self.appUserObject = [AppUserObject getFromUserDefault];
-//    if (!nameArrayList.count) {
-//        
-//        if (self.appUserObject.apiToken) {
-//           // [self startServiceToGetAppInfo];
-//        }
-//    }
-//    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-//    
-//     nameArrayList= [prefs objectForKey:@"menuItem"];
-    //  [self.slideViewTable setContentOffset:CGPointMake(0,0) animated:YES];
- // [self.Contacts_CollectionView reloadData];
-   
+    
+    
     NSLog(@"CAll API view will appear");
 }
 
@@ -261,14 +255,14 @@
     {
         [cell.imgCatergory setImage:[UIImage imageNamed:obj.image]];
         cell.lbl_sidemenuLabel.textColor=[UIColor whiteColor];
-        cell.backgroundColor=[JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0];
+        cell.backgroundColor=[JKSColor colorwithHexString:sideBarColor alpha:1.0];
     }
     else {
         
         
           [cell.imgCatergory setImage:[UIImage imageNamed:[imgArrayList objectAtIndex:indexPath.row]]];
        //  cell.lbl_sidemenuLabel.textColor=[JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0];
-         cell.backgroundColor=[JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0];
+         cell.backgroundColor=[JKSColor colorwithHexString:sideBarActiveColor alpha:1.0];
     }
     
    // cell.btnCheck.tag=indexPath.row;

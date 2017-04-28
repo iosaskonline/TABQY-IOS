@@ -95,10 +95,16 @@
             
             [self.appUserObject saveToUserDefault];
             
+            
+            
+            NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+            NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
             [[NSNotificationCenter defaultCenter]
              postNotificationName:@"LoginUpdate"
              object:  self.appUserObject];
-            
+            [[NSNotificationCenter defaultCenter]
+             postNotificationName:@"LoginUpdateForSidemenu"
+             object:  self.appUserObject];
             [self.navigationController popViewControllerAnimated:YES];
             
         }else{

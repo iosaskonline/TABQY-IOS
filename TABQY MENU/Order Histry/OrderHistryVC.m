@@ -19,6 +19,7 @@
 #import "CompleteOrderVC.h"
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
+#import "FeedBackVC.h"
 @interface OrderHistryVC ()
 {
     NSString *tbleId;
@@ -34,6 +35,10 @@
 @property(strong,nonatomic)NSMutableArray *arrayTable;
 @property(strong,nonatomic)IBOutlet UIView *viewSectionHeader;
 @property(strong,nonatomic)IBOutlet UIView *vietableHeader;
+
+
+@property (strong, nonatomic) IBOutlet UIDatePicker *pickerStartTime;
+@property (strong, nonatomic) IBOutlet UIDatePicker *pickerEndTime;
 
 @property(weak,nonatomic)IBOutlet UITableView *tblAllTable;
 @property(strong,nonatomic)IBOutlet UIView *viewAllTable;
@@ -55,6 +60,16 @@
     self.fromDate.text=date;
     self.toDate.text=date;
     self.tblHistory.tableHeaderView=self.vietableHeader;
+    [self.fromDate setNumberKeybord:self withLeftTitle:@"Clear" andRightTitle:@"Done"];
+    [self.toDate setNumberKeybord:self withLeftTitle:@"Clear" andRightTitle:@"Done"];
+    self.pickerStartTime.date = [ECSDate dateAfterHours:0 fromDate:[NSDate date]];
+    self.pickerEndTime.date = [ECSDate dateAfterMins:0 fromDate:self.pickerStartTime.date];
+    
+    [self.fromDate setText:[ECSDate getStringFromDate:self.pickerStartTime.date inFormat:@"yyyy-MM-dd"]];
+    [self.toDate setText:[ECSDate getStringFromDate:self.pickerEndTime.date inFormat:@"yyyy-MM-dd"]];
+    
+    [self.fromDate setInputView:self.pickerStartTime];
+    [self.toDate setInputView:self.pickerEndTime];
     [self startServiceToGetOrderHistory];
     [self startServiceToGetAllTable];
 }
@@ -189,22 +204,26 @@
     static NSString *CellIdentifier = @"Cell";
     
     
-[self.tblHistory registerNib:[UINib nibWithNibName:@"OrderHistoryTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
+  [self.tblHistory registerNib:[UINib nibWithNibName:@"OrderHistoryTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
     OrderHistoryTableCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
     cell.selectionStyle = UITableViewCellSelectionStyleNone;
     [self.tblHistory setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     cell.backgroundColor = [UIColor clearColor];
     OrderHistryObject *object;
         [cell.btnDetail addTarget:self action:@selector(clickToshowDetail:) forControlEvents:UIControlEventTouchUpInside];
-        
+       // [cell.btnFeedback addTarget:self action:@selector(clickToFeedback:) forControlEvents:UIControlEventTouchUpInside];
+
 
     if (indexPath.section==0) {
-         cell.btnFeedback.hidden=NO;
-        cell.btnDetail.hidden=NO;
+        // cell.btnFeedback.hidden=YES;
+         cell.btnDetail.hidden=NO;
          object=[self.arrayOrderProgress objectAtIndex:indexPath.row];
+    [cell.btnFeedback addTarget:self action:@selector(clickToFeedback:) forControlEvents:UIControlEventTouchUpInside];
     }else{
          object=[self.arrayCompletedOrder objectAtIndex:indexPath.row];
+          cell.btnFeedback.hidden=NO;
         cell.btnDetail.hidden=YES;
+ [cell.btnFeedback addTarget:self action:@selector(clickToFeedbackFromComplete:) forControlEvents:UIControlEventTouchUpInside];
     }
    
     cell.lbldate.text=object.orderDate;
@@ -216,6 +235,7 @@
     }
     cell.lblwaitername.text=object.waiterName;
         cell.btnDetail.tag=indexPath.row;
+         cell.btnFeedback.tag=indexPath.row;
     return cell;
     }else{
         static NSString *CellIdentifier = @"Cell";
@@ -235,21 +255,36 @@
 -(void)clickToshowDetail:(id)sender{
     UIButton *btn=(UIButton *)sender;
     OrderHistryObject *object=[self.arrayOrderProgress objectAtIndex:btn.tag];
-   
     //NSString *ordernum=object.orderNum;
     CompleteOrderVC *nav=[[CompleteOrderVC alloc]initWithNibName:@"CompleteOrderVC" bundle:nil];
     nav.orderObj=object;
     [self.navigationController pushViewController:nav animated:YES];
 }
 
+-(void)clickToFeedback:(id)sender{
+    UIButton *btn=(UIButton *)sender;
+    OrderHistryObject *object=[self.arrayOrderProgress objectAtIndex:btn.tag];
+    
+    FeedBackVC *nav=[[FeedBackVC alloc]initWithNibName:@"FeedBackVC" bundle:nil];
+    nav.orderObj=object;
+    [self.navigationController pushViewController:nav animated:YES];
+}
+
+-(void)clickToFeedbackFromComplete:(id)sender{
+    UIButton *btn=(UIButton *)sender;
+    OrderHistryObject *object=[self.arrayCompletedOrder objectAtIndex:btn.tag];
+
+    FeedBackVC *nav=[[FeedBackVC alloc]initWithNibName:@"FeedBackVC" bundle:nil];
+    nav.orderObj=object;
+    [self.navigationController pushViewController:nav animated:YES];
+}
+
+
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (tableView==self.tblAllTable) {
         TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
-        
-        
-        
-        
+    
         tbleId=connectionObject.tableId;
         self.txtTableName.text=connectionObject.tableName;
         // tbleId=[NSString stringWithFormat:@"%ld",(long)indexPath.row];
@@ -334,6 +369,69 @@
     [self.navigationController pushViewController:spl animated:YES];
     
 }
+
+
+
+- (IBAction)clickToSetStartTime:(id)sender {
+    
+    
+    [self.fromDate setText:[ECSDate getStringFromDate:self.pickerStartTime.date inFormat:@"yyyy-MM-dd"]];
+    
+}
+
+
+- (IBAction)clickToSetEndTime:(id)sender {
+    
+    [self.toDate setText:[ECSDate getStringFromDate:self.pickerEndTime.date inFormat:@"yyyy-MM-dd"]];
+}
+
+
+-(BOOL)textFieldShouldBeginEditing:(UITextField *)textField
+{
+     if(self.fromDate == textField)
+    {
+        //         [self resignTextResponder];
+        [self.fromDate setText:[ECSDate getStringFromDate:self.pickerStartTime.date inFormat:@"yyyy-MM-dd"]];
+        
+        //        [self.pickerStartTime setHidden:NO];
+        //        return NO;
+        
+    }
+    else if(self.toDate == textField)
+    {
+        //         [self resignTextResponder];
+        [self.toDate setText:[ECSDate getStringFromDate:self.pickerEndTime.date inFormat:@"yyyy-MM-dd"]];
+        
+        //        [self.pickerStartTime setHidden:NO];
+        //        return NO;
+        
+    }
+    return YES;
+    
+    
+}
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField{
+    [textField resignFirstResponder];
+    return YES;
+}
+- (BOOL)textViewShouldBeginEditing:(UITextView *)textView
+{
+    [textView resignFirstResponder];
+    return YES;
+}
+
+-(void)dismissKeyboardDiscardingValue:(UITextField *)textF
+{
+    
+//    if(textF == self.txtEnds || textF == self.txtStart)
+//        [textF setText:@""];
+    
+    [textF resignFirstResponder];
+    
+    
+}
+
 /*
 #pragma mark - Navigation
 

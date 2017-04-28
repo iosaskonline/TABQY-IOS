@@ -12,6 +12,8 @@
         <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="OrderHistryVC">
             <connections>
                 <outlet property="fromDate" destination="bH6-TY-KJS" id="tV2-LL-liH"/>
+                <outlet property="pickerEndTime" destination="256-nC-M6j" id="8Lu-TU-zFj"/>
+                <outlet property="pickerStartTime" destination="m13-If-bjT" id="thj-YH-9cM"/>
                 <outlet property="restorentBGImage" destination="dny-Mt-epy" id="AmO-Jf-M9w"/>
                 <outlet property="tblAllTable" destination="uGB-Ue-Hf1" id="rH3-wz-V4z"/>
                 <outlet property="tblHistory" destination="fxI-XS-86k" id="oCJ-Ms-jVi"/>
@@ -77,7 +79,7 @@
                             </connections>
                         </textField>
                         <textField opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" text="All" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="Q6d-NB-nOj">
-                            <rect key="frame" x="689" y="19" width="203" height="30"/>
+                            <rect key="frame" x="701" y="19" width="191" height="30"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <nil key="textColor"/>
                             <fontDescription key="fontDescription" type="system" pointSize="14"/>
@@ -87,7 +89,7 @@
                             </connections>
                         </textField>
                         <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="tY6-NZ-XTI">
-                            <rect key="frame" x="689" y="15" width="203" height="30"/>
+                            <rect key="frame" x="689" y="15" width="184" height="30"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                             <connections>
@@ -106,7 +108,7 @@
                             </connections>
                         </button>
                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Table" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="QPR-0k-LCz">
-                            <rect key="frame" x="637" y="16" width="52" height="33"/>
+                            <rect key="frame" x="640" y="16" width="53" height="33"/>
                             <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                             <fontDescription key="fontDescription" type="system" pointSize="17"/>
                             <nil key="textColor"/>
@@ -243,12 +245,12 @@
             <freeformSimulatedSizeMetrics key="simulatedDestinationMetrics"/>
             <point key="canvasLocation" x="-309" y="963"/>
         </view>
-        <view contentMode="scaleToFill" id="zmE-wD-229">
+        <view alpha="0.84999999999999998" contentMode="scaleToFill" id="zmE-wD-229">
             <rect key="frame" x="0.0" y="0.0" width="1024" height="768"/>
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
             <subviews>
                 <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" style="plain" separatorStyle="default" rowHeight="44" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="uGB-Ue-Hf1">
-                    <rect key="frame" x="667" y="158" width="235" height="413"/>
+                    <rect key="frame" x="696" y="166" width="254" height="437"/>
                     <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxX="YES" heightSizable="YES"/>
                     <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                     <connections>
@@ -257,8 +259,28 @@
                     </connections>
                 </tableView>
             </subviews>
-            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
+            <color key="backgroundColor" white="0.0" alpha="1" colorSpace="calibratedWhite"/>
             <point key="canvasLocation" x="33" y="375"/>
         </view>
+        <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" id="m13-If-bjT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="216"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+            <date key="date" timeIntervalSinceReferenceDate="515052526.60464001">
+                <!--2017-04-28 06:08:46 +0000-->
+            </date>
+            <connections>
+                <action selector="clickToSetStartTime:" destination="-1" eventType="valueChanged" id="iRF-kL-pfH"/>
+            </connections>
+        </datePicker>
+        <datePicker contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" datePickerMode="dateAndTime" minuteInterval="1" id="256-nC-M6j">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="216"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+            <date key="date" timeIntervalSinceReferenceDate="515052560.937769">
+                <!--2017-04-28 06:09:20 +0000-->
+            </date>
+            <connections>
+                <action selector="clickToSetEndTime:" destination="-1" eventType="valueChanged" id="KxK-l1-YeR"/>
+            </connections>
+        </datePicker>
     </objects>
 </document>

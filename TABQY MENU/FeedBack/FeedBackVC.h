@@ -8,6 +8,8 @@
 
 #import <UIKit/UIKit.h>
 #import "ECSBaseViewController.h"
+#import "OrderHistryObject.h"
 @interface FeedBackVC : ECSBaseViewController
 -(void)clickToPlaceOrderList:(id)sender;
+@property(strong,nonatomic) OrderHistryObject *orderObj;
 @end
