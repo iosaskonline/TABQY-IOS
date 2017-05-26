@@ -19,6 +19,7 @@
         self.restaurentId = [decoder decodeObjectForKey:@"resturant_id"];
         self.tableId = [decoder decodeObjectForKey:@"table_id"];
         self.tableName = [decoder decodeObjectForKey:@"table_name"];
+        self.Booked = [decoder decodeObjectForKey:@"isBooked"];
            }
     return self;
 }
@@ -28,6 +29,7 @@
     [encoder encodeObject:self.restaurentId forKey:@"resturant_id"];
     [encoder encodeObject:self.tableId forKey:@"table_id"];
     [encoder encodeObject:self.tableName forKey:@"table_name"];
+     [encoder encodeObject:self.Booked forKey:@"isBooked"];
 }
 
 + (TableListObject *)instanceFromDictionary:(NSDictionary *)aDictionary {
@@ -47,7 +49,7 @@
     self.restaurentId = [aDictionary objectForKey:@"resturant_id"];
     self.tableId = [aDictionary objectForKey:@"table_id"];
     self.tableName = [aDictionary objectForKey:@"table_name"];
-   
+    self.Booked = [aDictionary objectForKey:@"isBooked"];
     
 }
 

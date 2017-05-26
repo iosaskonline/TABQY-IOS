@@ -18,6 +18,7 @@
 #import "OrderProgressObject.h"
 #import "TableListObject.h"
 #import "OrderTableCell.h"
+#import "MVYSideMenuController.h"
 #import "QuestionObject.h"
 @interface FeedBackVC ()<UITextFieldDelegate>{
     NSString *tableId;
@@ -25,11 +26,12 @@
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage;
+@property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage2;
 @property(strong,nonatomic)NSMutableArray *arrayQues;
 @property(strong,nonatomic)NSMutableArray *arraySelected;
 @property(strong,nonatomic)NSMutableArray *arraySelectedNo;
 @property(weak,nonatomic)IBOutlet UITableView *tblFeedback;
-@property (strong, nonatomic) UITextField *txtAnswer;
+
 @property(weak,nonatomic)IBOutlet UITextField *txtName;
 @property(weak,nonatomic)IBOutlet UITextField *txtEmail;
 @property(weak,nonatomic)IBOutlet UITextField *txtPhone;
@@ -60,6 +62,11 @@
      {
          // [self.activityProfileImage stopAnimating];
      }];
+    
+    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+     {
+         // [self.activityProfileImage stopAnimating];
+     }];
     // Do any additional setup after loading the view from its nib.
     self.tblFeedback.tableFooterView=self.viewtblFooter;
     self.arraySelected=[[NSMutableArray alloc]init];
@@ -75,7 +82,7 @@
     }else{
     [self startServiceToGetAllTable];
     }
-    self.txtAnswer.delegate=self;
+   // self.txtAnswer.delegate=self;
 }
 
 
@@ -275,7 +282,7 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
     
     if (tableView==self.tblFeedback) {
-         return 130;
+         return 133;
     }else
     return 40;
 }
@@ -292,11 +299,15 @@
         
         [self.tblFeedback registerNib:[UINib nibWithNibName:@"FeedbackTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
         FeedbackTableCell *cell = [tableView dequeueReusableCellWithIdentifier:CellIdentifier ];
+        
+        
+    
         cell.selectionStyle = UITableViewCellSelectionStyleNone;
         [self.tblFeedback setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         cell.backgroundColor = [UIColor clearColor];
          QuestionObject  *object=[self.arrayQues objectAtIndex:indexPath.row];
-       
+      //  UITextField *txtAnswer;
+
     [cell.btnRadioYes addTarget:self action:@selector(clickToYes:)forControlEvents:UIControlEventTouchUpInside];
     [cell.btnRadioNo addTarget:self action:@selector(clickToNo:)forControlEvents:UIControlEventTouchUpInside];
 
@@ -305,52 +316,78 @@
     if ([object.question_type isEqualToString:@"2"]) {
         cell.viewRadiotype2.hidden=NO;
         cell.viewtextEntryType.hidden=YES;
+      
+        cell.txtAnswer.hidden=YES;
     }else if ([object.question_type isEqualToString:@"3"]){
+         cell.txtAnswer.hidden=NO;
         cell.viewRadiotype2.hidden=YES;
-        cell.viewtextEntryType.hidden=NO;
-        self.txtAnswer=[[UITextField alloc]initWithFrame:CGRectMake(cell.viewtextEntryType.frame.origin.x+10, cell.viewtextEntryType.frame.origin.y, cell.viewtextEntryType.frame.size.width, cell.viewtextEntryType.frame.size.height)];
-        self.txtAnswer.delegate=self;
-        object.answer=self.txtAnswer.text;
-        [cell.contentView addSubview:self.txtAnswer];
+        cell.viewtextEntryType.hidden=YES;
+//               txtAnswer=[[UITextField alloc]initWithFrame:CGRectMake(cell.viewtextEntryType.frame.origin.x+10, cell.viewtextEntryType.frame.origin.y, cell.viewtextEntryType.frame.size.width, cell.viewtextEntryType.frame.size.height)];
+        cell.txtAnswer.delegate=self;
+        //cell.txtAnswer.backgroundColor=[UIColor grayColor];
+        object.answer=cell.txtAnswer.text;
+        [cell.contentView addSubview:cell.txtAnswer];
     }else{
+         cell.txtAnswer.hidden=YES;
+        cell.viewRadiotype2.hidden=YES;
+        
          cell.viewtextEntryType.hidden=NO;
         NSArray *items = [[dict valueForKey:@"choices"] componentsSeparatedByString:@","];
         
-        UIScrollView *scroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 30, cell.viewtextEntryType.frame.size.width+500, 40)];
-        scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+1000, 40);
+        UIScrollView *scroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 30, cell.viewtextEntryType.frame.size.width+1000, 40)];
+       
         scroll.showsHorizontalScrollIndicator = YES;
-        
-  
-        cell.segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
-        cell.segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+830, 30);
+        UISegmentedControl *segmentedControl;
+        if (items.count>15) {
+            
+             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+3000, 40);
+             segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+2030, 30);
+            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+        }else if (items.count>10){
+            
+             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+2000, 40);
+             segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+1030, 30);
+            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+        }else if (items.count>5){
+            
+             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+1000, 40);
+             segmentedControl.frame = CGRectMake(0, 0, cell.viewtextEntryType.frame.size.width+530, 30);
+            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+        }else if (items.count<5){
+            
+            scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+800, 40);
+             segmentedControl.frame = CGRectMake(0, 0, cell.viewtextEntryType.frame.size.width+830, 30);
+        }
+        segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
+       
      
         
         
-        cell.segmentedControl.backgroundColor=[UIColor whiteColor];
+        segmentedControl.backgroundColor=[UIColor whiteColor];
          scroll.backgroundColor=[UIColor whiteColor];
-        cell.segmentedControl.selectedSegmentIndex = 0;
-        cell.segmentedControl.tintColor=[UIColor clearColor];
-     [cell.segmentedControl addTarget:self action:@selector(changeFilter:) forControlEvents:UIControlEventValueChanged];
+        segmentedControl.selectedSegmentIndex = 0;
+        segmentedControl.tintColor=[UIColor clearColor];
+     [segmentedControl addTarget:self action:@selector(changeFilter:) forControlEvents:UIControlEventValueChanged];
         NSDictionary *attributes2 = [NSDictionary dictionaryWithObjectsAndKeys:
                                      [UIFont fontWithName:@"Helvetica" size:14], NSFontAttributeName,
                                      [UIColor blackColor], NSForegroundColorAttributeName, nil];
         
-        NSString *title = [cell.segmentedControl titleForSegmentAtIndex:cell.segmentedControl.selectedSegmentIndex];
+        NSString *title = [segmentedControl titleForSegmentAtIndex:segmentedControl.selectedSegmentIndex];
         object.answer=title;
        
-        [cell.segmentedControl setTitleTextAttributes:attributes2 forState:UIControlStateNormal];
-        [cell.segmentedControl setDividerImage:[UIImage imageNamed:@"radio_icon02.png"] forLeftSegmentState:UIControlStateSelected rightSegmentState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
+        [segmentedControl setTitleTextAttributes:attributes2 forState:UIControlStateNormal];
+        [segmentedControl setDividerImage:[UIImage imageNamed:@"radio_icon02.png"] forLeftSegmentState:UIControlStateSelected rightSegmentState:UIControlStateNormal barMetrics:UIBarMetricsDefault];
       
         
-        [cell.segmentedControl setDividerImage:[UIImage imageNamed:@"radio_icon2.png"] forLeftSegmentState:UIControlStateSelected rightSegmentState:UIControlStateSelected barMetrics:UIBarMetricsDefault];
+        [segmentedControl setDividerImage:[UIImage imageNamed:@"radio_icon2.png"] forLeftSegmentState:UIControlStateSelected rightSegmentState:UIControlStateSelected barMetrics:UIBarMetricsDefault];
         
-        [cell.segmentedControl setContentPositionAdjustment:UIOffsetMake(-10, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+        
         
 
-        [cell.segmentedControl setContentMode:UIViewContentModeLeft];
+        [segmentedControl setContentMode:UIViewContentModeLeft];
 
        
-        [scroll addSubview:cell.segmentedControl];
+        [scroll addSubview:segmentedControl];
 
         [cell.viewtextEntryType addSubview:scroll];
         cell.viewRadiotype2.hidden=YES;
@@ -578,6 +615,8 @@
             self.txtTableName.text=connectionObject.tableName;
             [self startServiceToGetAllOrderNum];
             
+        }else{
+            
         }
        
         
@@ -599,11 +638,17 @@
 -(IBAction)onChooseTable:(id)sender{
     if (self.orderObj.tableId.length) {
         return;
+    }else{
+        if (_arrayTable.count) {
+            
+            self.viewAllTable.hidden=NO;
+            self.tblAllTable.hidden=NO;
+            self.tblAllOrder.hidden=YES;
+            [self.view addSubview:self.viewAllTable];
+        }else{
+            [ECSToast showToast:@"No table found!" view:self.view];
+        }
     }
-    self.viewAllTable.hidden=NO;
-    self.tblAllTable.hidden=NO;
-    self.tblAllOrder.hidden=YES;
-    [self.view addSubview:self.viewAllTable];
 }
 -(IBAction)onChooseOrder:(id)sender{
     if (self.orderObj.tableId.length) {
@@ -631,16 +676,72 @@
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
  //   [self updateTextLabelsWithText: newString];
      QuestionObject  *object=[self.arrayQues objectAtIndex:3];
-    if (self.txtAnswer.editing) {
-        object.answer=newString;
-    }
-    
+//    if (self.txtAnswer.editing) {
+//        object.answer=newString;
+//    }
+//
     
     NSLog(@"Changed Str: %@",object.answer);
     
     return YES;
 }
+- (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event{
+    NSLog(@"touchesBegan:withEvent:");
+    [self.view endEditing:YES];
+    [super touchesBegan:touches withEvent:event];
+    [self resignFirstResponder];
+}
 
+- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+    if (textField==self.txtName) {
+         [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
+        [self.txtPhone becomeFirstResponder];
+    }else if (textField==self.txtPhone){
+        [self.txtEmail becomeFirstResponder];
+    }else{
+        [self resignFirstResponder];
+    }
+    
+    return YES;
+}
+- (BOOL)textFieldShouldEndEditing:(UITextField *)textField{
+    // add your method here
+    if (textField==self.txtName) {
+        [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
+        [self.txtName becomeFirstResponder];
+    }else if (textField==self.txtPhone){
+        [self.txtEmail becomeFirstResponder];
+    }else if (textField==self.txtEmail){
+        [self becomeFirstResponder];
+    }
+    return YES;
+    {
+        
+    }
+}
+//    -(void)textFieldShouldBeginEditing:(UITextField *)textField {
+//        if (textField==self.txtName) {
+//            [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
+//            [self.txtName becomeFirstResponder];
+//        }else if (textField==self.txtPhone){
+//            [self.txtEmail becomeFirstResponder];
+//        }else if (textField==self.txtEmail){
+//            [self becomeFirstResponder];
+//        }
+//    }
+
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 /*
 #pragma mark - Navigation
 

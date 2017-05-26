@@ -48,7 +48,7 @@
        [super viewDidLoad];
     if (self.appUserObject==nil) {
         LoginVC *login=[[LoginVC alloc]initWithNibName:@"LoginVC" bundle:nil];
-        [self.navigationController pushViewController:login animated:YES];
+        [self.navigationController pushViewController:login animated:NO];
     }
     
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -57,8 +57,10 @@
                                                object:nil];
      NSString *scrName=[NSString stringWithFormat:@"%@ Dashbord",self.appUserObject.resturantName];
   [self settingTopView:self.viewTop onController:self andTitle:scrName andImg:@"nav_header_icon.png"];
+    //@"restorentgp.jpg"
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          
      }];
@@ -219,9 +221,11 @@
     NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
     if(response.isValid)
     {
-        
+
        
         NSArray *arr=[rootDictionary valueForKey:@"tax_type"];
+        [[NSUserDefaults standardUserDefaults]setObject:arr forKey:@"tax_type"];
+        [[NSUserDefaults standardUserDefaults]synchronize];
         for (NSDictionary * dictionary in arr)
         {
             NSString *taxName=[dictionary valueForKey:@"tax_name"];

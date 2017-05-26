@@ -34,7 +34,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Home Delivery",self.appUserObject.resturantName] andImg:@"arrow.png"];
+   // [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Home Delivery",self.appUserObject.resturantName] andImg:@"arrow.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
@@ -48,7 +48,7 @@
     self.txtDate.text=[_dict valueForKey:@"order_date"];
     self.txtTime.text=[self.dict valueForKey:@"order_time"];
     self.txtOrderId.text=[self.dict valueForKey:@"order_no"];
-    self.txtTotalCast.text=[self.dict valueForKey:@"total_cost"];
+    self.txtTotalCast.text=[NSString stringWithFormat:@"%@ %@",self.appUserObject.resturantCurrency,[self.dict valueForKey:@"total_cost"]];
     
     
     
@@ -68,12 +68,14 @@
 -(IBAction)onClickSubmitHomeDeliveryOrder:(id)sender{
     if (self.txtCusName.text.length<=0) {
            [ECSToast showToast:@"Please enter customer name." view:self.view];
-    }else if(self.txtCusAdd.text.length<=0){
-         [ECSToast showToast:@"Please enter customer address." view:self.view];
     }
-    else if( !(self.txtCusPh.text.length==10)){
+    else if( !(self.txtCusPh.text.length)){
         [ECSToast showToast:@"Please enter customer  valid Ph. number." view:self.view];
-    }else
+    }
+    else if(self.txtCusAdd.text.length<=0){
+        [ECSToast showToast:@"Please enter customer address." view:self.view];
+    }
+    else
     [self startServiceToGetCustomerDetail];
     
 }

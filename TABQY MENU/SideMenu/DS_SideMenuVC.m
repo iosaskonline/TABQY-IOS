@@ -23,6 +23,7 @@
 #import "WaiterProfileVC.h"
 #import "ECSHelper.h"
 #import "AboutRestaurantVC.h"
+#import "ASK_HomeVC.h"
 @interface DS_SideMenuVC ()<UITableViewDelegate,UITableViewDataSource>
 
 {
@@ -59,10 +60,6 @@
 @end
 
 @implementation DS_SideMenuVC
-
-
-
-
 
 - (void)viewDidLoad {
     // [self.sideMenuTable tableViewScrollToBottomAnimated:NO];
@@ -277,37 +274,45 @@
     selectedIndex =[[NSMutableArray alloc]init];
        UIViewController * contentScreen = nil;
     NSString *strContact=[NSString stringWithFormat:@"%li",indexPath.row];
-   // MenuItemObject * connectionObject = [itemArray objectAtIndex:indexPath.row];;
+ 
     BOOL flag=   [selectedIndex containsObject:strContact];
-   // NSString *contactId=connectionObject.image;
+   
     if(flag == NO )
     {
-        
-      //  [btn setImage:[UIImage imageNamed:@"checked-icon.png"] forState:UIControlStateNormal];
         [selectedIndex addObject:strContact];
        
     }
     else {
         
-       
-    
         [selectedIndex removeObject:strContact];
-               //[_arraySelected removeObject:strContact];
     }
 
-    [self.sideMenuTable reloadData];
-//    {
-//        
-    
-        [self.sideMenuController closeMenu];
+  
+
+  
     if (indexPath.row==0) {
         contentScreen = (TableListVC *) [[TableListVC alloc]initWithNibName:@"TableListVC" bundle:nil];
        
     }else if (indexPath.row==1){
+       
         [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
         [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+         contentScreen = (ASK_HomeVC *) [[ASK_HomeVC alloc]initWithNibName:@"ASK_HomeVC" bundle:nil];
+//        UIViewController *menuVC=[[DS_SideMenuVC alloc]initWithNibName:@"DS_SideMenuVC" bundle:nil];
+//        MVYSideMenuOptions *options = [[MVYSideMenuOptions alloc] init];
+//        options.contentViewScale = 1.0;
+//        options.contentViewOpacity = 0.05;
+//        options.shadowOpacity = 0.0;
+//        
+//        MVYSideMenuController *sideMenuController = [[MVYSideMenuController alloc] initWithMenuViewController:menuVC contentViewController:contentScreen2 options:options];
+//          sideMenuController.menuFrame = CGRectMake(0, 0, 320.0, self.view.bounds.size.height);
+//         [self.sideMenuController.navigationController pushViewController:sideMenuController animated:NO];
+       
     }else if (indexPath.row==2){
           contentScreen = (MenuItemVC *) [[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
+      
+
+        
     }else if (indexPath.row==3){
          contentScreen = (TodaySplVC *) [[TodaySplVC alloc]initWithNibName:@"TodaySplVC" bundle:nil];
     }else if (indexPath.row==4){
@@ -325,19 +330,45 @@
     }
     else{
         [AppUserObject removeFromUserDefault];
-    
+        [self removeAllSaveData];
+    selectedIndex =[[NSMutableArray alloc]init];
         contentScreen = (LoginVC *) [[LoginVC alloc]initWithNibName:@"LoginVC" bundle:nil];
        
     }
     
     if(contentScreen){
-        [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
+        
+        UIViewController *menuVC=[[DS_SideMenuVC alloc]initWithNibName:@"DS_SideMenuVC" bundle:nil];
+        MVYSideMenuOptions *options = [[MVYSideMenuOptions alloc] init];
+        options.contentViewScale = 1.0;
+        options.contentViewOpacity = 0.05;
+        options.shadowOpacity = 0.0;
+        
+        MVYSideMenuController *sideMenuController = [[MVYSideMenuController alloc] initWithMenuViewController:menuVC contentViewController:contentScreen options:options];
+        sideMenuController.menuFrame = CGRectMake(0, 0, 320.0, self.view.bounds.size.height);
+        [self.navigationController pushViewController:sideMenuController animated:NO];
+       // [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
         
     }
-
-
+  [self.sideMenuController closeMenu];
+  [self.sideMenuTable reloadData];
 }
-
+-(void)removeAllSaveData{
+    
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    
+    NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
+    NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
+    
+    for (int i=0; i<ooldFoodid.count; i++) {
+        NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
+        [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
+    }
+    
+    [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
+   
+}
 
 @end
 

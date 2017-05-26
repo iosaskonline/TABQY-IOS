@@ -17,6 +17,7 @@
 #import "TPKeyboardAvoidingScrollView.h"
 #import "ReletedItemCell.h"
 #import "PlaceOrderVC.h"
+#import "MVYSideMenuController.h"
 @interface AboutRestaurantVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 @property(weak,nonatomic)IBOutlet UIImageView *imglogo;
@@ -171,6 +172,17 @@
     
     
 }
-
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 
 @end

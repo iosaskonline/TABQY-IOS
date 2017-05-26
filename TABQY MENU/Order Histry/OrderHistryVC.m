@@ -19,6 +19,7 @@
 #import "CompleteOrderVC.h"
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
+#import "MVYSideMenuController.h"
 #import "FeedBackVC.h"
 @interface OrderHistryVC ()
 {
@@ -26,6 +27,7 @@
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage;
+@property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage2;
 @property(weak,nonatomic)IBOutlet UITextField *fromDate;
 @property(weak,nonatomic)IBOutlet UITextField *toDate;
 @property(weak,nonatomic)IBOutlet UITableView *tblHistory;
@@ -54,6 +56,11 @@
      {
          // [self.activityProfileImage stopAnimating];
      }];
+    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+     {
+         // [self.activityProfileImage stopAnimating];
+     }];
+
     // Do any additional setup after loading the view from its nib.
      NSDate *now = [NSDate date];
      NSString *date=[ECSDate getFormattedDateString:now];
@@ -94,10 +101,11 @@
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
-                                 date,@"from_date",
-                                 date,@"to_date",
+                                 self.fromDate.text,@"from_date",
+                                 self.toDate.text,@"to_date",
+                                 self.appUserObject.user_id,@"user_id",
                                  tbleId,@"table_id",
-                                 nil];
+                                        nil];
     
     
     
@@ -227,7 +235,7 @@
     }
    
     cell.lbldate.text=object.orderDate;
-    cell.lblvalue.text=object.orderValue;
+    cell.lblvalue.text=[NSString stringWithFormat:@" %@ %@",self.appUserObject.resturantCurrency,object.orderValue];
     cell.lblOrderTime.text=object.ordrTime;
     cell.lbltablename.text=object.tableName;
     if ([cell.lbltablename.text isEqualToString:@""]) {
@@ -241,11 +249,16 @@
         static NSString *CellIdentifier = @"Cell";
         [self.tblAllTable registerNib:[UINib nibWithNibName:@"OrderTableCell" bundle:nil]forCellReuseIdentifier:@"Cell"];
         OrderTableCell *cell = [self.tblAllTable dequeueReusableCellWithIdentifier:CellIdentifier ];
-        
-        cell.lbltableName.text=[NSString stringWithFormat:@"Table %ld",(long)indexPath.row];
+        cell.selectionStyle = UITableViewCellSelectionStyleNone;
+        [self.tblAllTable setSeparatorStyle:UITableViewCellSeparatorStyleNone];
+      //  cell.lbltableName.text=[NSString stringWithFormat:@"Table %ld",(long)indexPath.row];
+        if (indexPath.row==0) {
+            cell.lbltableName.text=@"All";
+        }else{
         TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
         
         cell.lbltableName.text=connectionObject.tableName;
+        }
         
         return cell;
     }
@@ -283,10 +296,15 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (tableView==self.tblAllTable) {
+        if (indexPath.row==0) {
+            tbleId=nil;
+            self.txtTableName.text=@"All";
+        }else{
         TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
     
         tbleId=connectionObject.tableId;
         self.txtTableName.text=connectionObject.tableName;
+        }
         // tbleId=[NSString stringWithFormat:@"%ld",(long)indexPath.row];
     }
     
@@ -329,6 +347,7 @@
     if(response.isValid)
     {
         self.arrayTable=[[NSMutableArray alloc]init];
+        [self.arrayTable addObject:@"All"];
         NSArray *arr=[rootDictionary valueForKey:@"waitertable"];
         for (NSDictionary * dictionary in arr)
         {
@@ -432,6 +451,22 @@
     
 }
 
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
+
+-(IBAction)onclickBg:(id)sender{
+    self.viewAllTable.hidden=YES;
+}
 /*
 #pragma mark - Navigation
 

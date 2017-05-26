@@ -22,11 +22,12 @@
 #import "MenuItemVC.h"
 #import "AssociatedFoods.h"
 #import "SearchFoodVC.h"
+#import "MVYSideMenuController.h"
 @interface CompleteOrderVC (){
     CGFloat Price;
     CGFloat anotheItemPrice;
     CGFloat vatPrice;
-    
+     CGFloat totalpriceWithoutVat;
     CGFloat assoPreviousItemPrice;
     CGFloat assoItemPrice;
     CGFloat totalPricewithtaxandassociateItemPrice;
@@ -37,6 +38,8 @@
     NSString *tbleId;
     NSString *orderNumber;
     
+    BOOL selectedTab;
+     CGFloat allPreviousPriceWithTaxes;
     CGFloat assoPrice;
     CGFloat preAssoPrice;
     NSString *subtotal;
@@ -71,6 +74,7 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    allPreviousPriceWithTaxes=0;
     [self getOpdatedList];
     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Place Order",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
@@ -88,6 +92,9 @@
     if (self.orderObj.tableId.length||self.orderObj.orderNum.length) {
         tbleId=self.orderObj.tableId;
         orderNumber= self.orderObj.orderNum;
+        [ECSUserDefault saveString:self.orderObj.tableName ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
+        [ECSUserDefault saveString:self.orderObj.orderNum ToUserDefaultForKey:@"orderNum"];
         if ([self.orderObj.tableName isEqualToString:@""]) {
               self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",@"home develiry"];
         }else{
@@ -106,7 +113,7 @@
     
     
     
-    
+    selectedTab=YES;
     [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
     [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
   
@@ -188,18 +195,39 @@
     }
     
     NSLog(@"arr %@",self.arayjsonOrder);
-    NSString *taxVal=[ECSUserDefault getObjectFromUserDefaultForKey:@"tax_value"];
-    vatPrice=Price*[taxVal floatValue]/100;
-    NSString *taxname=[ECSUserDefault getObjectFromUserDefaultForKey:@"tax_name"];
-    
-    //
+    totalpriceWithoutVat=Price;
+//    NSString *taxVal=[ECSUserDefault getObjectFromUserDefaultForKey:@"tax_value"];
+//    vatPrice=Price*[taxVal floatValue]/100;
+//    NSString *taxname=[ECSUserDefault getObjectFromUserDefaultForKey:@"tax_name"];
+//    
+//    //
     totalPrice=[NSString stringWithFormat:@"%.2f",Price+vatPrice];
     taxPrice=[NSString stringWithFormat:@"%.2f",vatPrice];
     vatPricetotal=[NSString stringWithFormat:@"%.2f",vatPrice];
    // self.lblPreviousTotalPrice.text=[NSString stringWithFormat:@"Previous total price :    %@",@"INR 0.00"];
     self.lblOngoingTotalPrice.text=[NSString stringWithFormat:@"Ongoing total price :   %@ %.2f",self.appUserObject.resturantCurrency,Price];
-    self.lblVatTotalPrice.text=[NSString stringWithFormat:@"%@ %@%@ :   %@ %.2f",taxname,taxVal,@"%",self.appUserObject.resturantCurrency,vatPrice];
+//    self.lblVatTotalPrice.text=[NSString stringWithFormat:@"%@ %@%@ :   %@ %.2f",taxname,taxVal,@"%",self.appUserObject.resturantCurrency,vatPrice];
     self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total payable price :   %@ %.2f",self.appUserObject.resturantCurrency,Price+vatPrice+[subtotal floatValue]];
+    
+    NSMutableArray *arrayAlltax = [[[NSUserDefaults standardUserDefaults] arrayForKey:@"tax_type"] mutableCopy];
+    NSMutableString* result = [[NSMutableString alloc]init];
+   
+    for (int i=0; i<arrayAlltax.count;i++) {
+        NSDictionary *dict=[arrayAlltax objectAtIndex:i];
+        NSString *taxName=[dict valueForKey:@"tax_name"];
+        NSString *taxValue=[dict valueForKey:@"tax_value"];
+        vatPrice=totalpriceWithoutVat*[taxValue floatValue]/100;
+        
+        
+        Price=Price+vatPrice;
+        [result appendFormat:@"%@\n", [NSString stringWithFormat:@"%@ %@%@ : %@ %.2f",taxName,taxValue,@"%",self.appUserObject.resturantCurrency,vatPrice]];
+       
+        
+    }
+    self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total payable amount : %@ %.2f",self.appUserObject.resturantCurrency,Price+allPreviousPriceWithTaxes];
+    self.lblVatTotalPrice.text=result;
+    
+    
     [self.tblOrder reloadData];
     
 }
@@ -260,6 +288,12 @@
        // cell.lblFoodprice.text=[NSString stringWithFormat:@"%@ %@",self.appUserObject.resturantCurrency,object.price];
         cell.lbldescription.text=[NSString stringWithFormat:@"%@",object.foodDescription];
         
+        
+        if (selectedTab==YES) {
+            [cell.btnCancel setHidden:YES];
+        }else{
+               [cell.btnCancel setHidden:NO];
+        }
         
         [cell.btnCancel addTarget:self action:@selector(clickToRemove:) forControlEvents:UIControlEventTouchUpInside];
         
@@ -368,10 +402,11 @@
         tbleId=connectionObject.tableId;
         
         self.lblselectedTable.text=[NSString stringWithFormat:@"Order For table number %@",connectionObject.tableName];
+        self.viewAllTable.hidden=YES;
+        [self startServiceToSubmitFoodOrder];
     }
     
-    self.viewAllTable.hidden=YES;
-    [self startServiceToSubmitFoodOrder];
+ 
     
 }
 -(void)clickToRemove:(id)sender{
@@ -500,21 +535,31 @@
     [class setServiceMethod:POST];
     
     [class setServiceURL:[NSString stringWithFormat:@"%@re_food_orders",SERVERURLPATH]];
+    NSString *pricewithTax=[NSString stringWithFormat:@"%.2f",Price];
     
+    NSString *priceWithouttax=[NSString stringWithFormat:@"%.2f",totalpriceWithoutVat];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.resturantId, @"resturant_id",
                                  self.appUserObject.user_id, @"user_id",
                                  tbleId,@"table_id",
                                  @"2", @"type",
                                  @"0", @"status",
-                                 totalPrice, @"total_price",
+                                 priceWithouttax, @"total_price",
                                  orderNumber,@"order_no",
-                                 @"0", @"sales_tax",
-                                 taxPrice, @"service_tax",
-                                 totalPrice, @"payable_amount",
+                                 //@"0", @"sales_tax",
+                                 //taxPrice, @"service_tax",
+                                 pricewithTax, @"payable_amount",
                                  self.arayjsonOrder, @"orders",
                                  nil];
-    
+    NSMutableArray *arrayAlltax = [[[NSUserDefaults standardUserDefaults] arrayForKey:@"tax_type"] mutableCopy];
+    for (int i=0; i<arrayAlltax.count;i++) {
+        NSDictionary *dict2=[arrayAlltax objectAtIndex:i];
+        NSString *taxName=[dict2 valueForKey:@"tax_name"];
+        NSString *taxValue=[dict2 valueForKey:@"tax_value"];
+        vatPrice=totalpriceWithoutVat*[taxValue floatValue]/100;
+        [dict setObject:[NSString stringWithFormat:@"%.2f",vatPrice] forKey:taxName];
+        
+    }
     
     [class addJson:dict];
     [class setCallback:@selector(callBackServiceToSubmitFoodOrder:)];
@@ -535,10 +580,10 @@
     {
         if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Order Successfully"]) {
             [self removeAllSaveData];
-            [ECSAlert showAlert:@"Order Successfully Completed."];
-            [self.navigationController popToRootViewControllerAnimated:YES];
+            [ECSAlert showAlert:@"Order Submitted Successfully"];
+           // [self.navigationController popToRootViewControllerAnimated:YES];
         }else if([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Table Id is Missing"]){
-             [ECSAlert showAlert:@"Table Id is Missing!"];
+             [ECSAlert showAlert:@"Please complete this order."];
         }
         else{
             [ECSAlert showAlert:@"You have not added any On Going order!"];
@@ -640,10 +685,37 @@
             [self.orderArray addObject:object];
         }
         subtotal=[rootDictionary valueForKey:@"sub_total"];
-        CGFloat total=Price+vatPrice+[subtotal floatValue];
-        self.lblPreviousTotalPrice.text=[NSString stringWithFormat:@"Previous total price :    %@ %.2f",self.appUserObject.resturantCurrency,[subtotal floatValue]];
+       // subtotal=self.orderObj.orderValue;
+       
         
-         self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total Payable price :    %@ %.2f",self.appUserObject.resturantCurrency,total];
+        
+        
+        
+        NSMutableArray *arrayAlltax = [[[NSUserDefaults standardUserDefaults] arrayForKey:@"tax_type"] mutableCopy];
+      //  NSMutableString* result = [[NSMutableString alloc]init];
+       
+        allPreviousPriceWithTaxes=[subtotal floatValue];
+        CGFloat taxes;
+        taxes=0;
+        for (int i=0; i<arrayAlltax.count;i++) {
+            NSDictionary *dict=[arrayAlltax objectAtIndex:i];
+            NSString *taxName=[dict valueForKey:@"tax_name"];
+            NSString *taxValue=[dict valueForKey:@"tax_value"];
+            
+            taxes=[[rootDictionary valueForKey:@"sub_total"] floatValue]*[taxValue floatValue]/100;
+            allPreviousPriceWithTaxes=allPreviousPriceWithTaxes+taxes;
+//            vatPrice=totalpriceWithoutVat*[taxValue floatValue]/100;
+//            
+//            
+//            Price=Price+vatPrice;
+//            [result appendFormat:@"%@\n", [NSString stringWithFormat:@"%@ %@%@ : %@ %.2f",taxName,taxValue,@"%",self.appUserObject.resturantCurrency,vatPrice]];
+            
+            
+        }
+         CGFloat total=Price+allPreviousPriceWithTaxes;
+        self.lblPreviousTotalPrice.text=[NSString stringWithFormat:@"Previous total price :    %@ %.2f",self.appUserObject.resturantCurrency,allPreviousPriceWithTaxes];
+        
+         self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total payable amount :    %@ %.2f",self.appUserObject.resturantCurrency,total];
         [self.tblOrder reloadData];
     }
     
@@ -654,13 +726,12 @@
 -(IBAction)onClickOnGoingOrder:(id)sender{
       [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
      [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
+    selectedTab=NO;
     [self getOpdatedList];
     
 }
-
-
--(IBAction)onClickPreviousOrder:(id)sender{
-    
+    -(IBAction)onClickPreviousOrder:(id)sender{
+    selectedTab=YES;
     [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
   
     [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
@@ -748,6 +819,8 @@
     if(response.isValid)
     {
         if ([rootDictionary objectForKey:@"msg"]) {
+            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
              [self.navigationController popToRootViewControllerAnimated:YES];
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
@@ -761,30 +834,37 @@
 
 
 -(IBAction)onClickComplete:(id)sender{
-    if (self.orderObj.tableName.length) {
+    NSString *tableName=[ECSUserDefault getStringFromUserDefaultForKey:@"tablename"];
+    NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
+    if (tableName.length) {
+        tbleId=tableid;
         [self startServiceToCompleteOrder];
     }else{
         [self startServiceToCompleteHomeOrder];
     }
 }
 -(IBAction)onClickMore:(id)sender{
-    MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
-    menuVC.addMoreSelectedOrder=self.orderObj.orderNum;
-    if (self.orderObj.tableName.length) {
-        [ECSUserDefault saveString:self.orderObj.tableName ToUserDefaultForKey:@"tablename"];
-        [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
+    NSString *tableName=[ECSUserDefault getStringFromUserDefaultForKey:@"tablename"];
+    NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
+    NSString *orderNumb=[ECSUserDefault getStringFromUserDefaultForKey:@"orderNum"];
+    if (tableName.length) {
+        MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
+        menuVC.addMoreSelectedOrder=orderNumb;
+        [ECSUserDefault saveString:tableName ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:tableid ToUserDefaultForKey:@"tableId"];
+         [self.navigationController pushViewController:menuVC animated:YES];
     }else{
-//        [ECSUserDefault saveString:[ECSUserDefault get] ToUserDefaultForKey:@"tablename"];
-//        [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
+       // else if([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Table Id is Missing"]){
+            [ECSAlert showAlert:@"Can't add more order in home delivery.\nPlease complete this order."];
+       // }
     }
     
    
-    [self.navigationController pushViewController:menuVC animated:YES];
+   
 }
 -(void)removeAllSaveData{
     
-    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
-    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+   
     NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
     NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
     
@@ -815,6 +895,19 @@
     
     SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
     [self.navigationController pushViewController:spl animated:YES];
+    
+}
+
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
     
 }
 /*

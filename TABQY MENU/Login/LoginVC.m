@@ -92,6 +92,10 @@
         
         if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Successfully LoggedIn"]) {
             self.appUserObject = [AppUserObject instanceFromDictionary:[rootDictionary objectForKey:@"user_detail"]];
+            if ([self.appUserObject.sidebarColor isEqualToString:@""]||self.appUserObject.sidebarColor==nil) {
+                self.appUserObject.sidebarColor=@"#0294A5";
+                self.appUserObject.sidebarActiveColor=@"#03353E";
+            }
             
             [self.appUserObject saveToUserDefault];
             
@@ -105,7 +109,7 @@
             [[NSNotificationCenter defaultCenter]
              postNotificationName:@"LoginUpdateForSidemenu"
              object:  self.appUserObject];
-            [self.navigationController popViewControllerAnimated:YES];
+            [self.navigationController popViewControllerAnimated:NO];
             
         }else{
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
@@ -122,8 +126,12 @@
 }
 
 -(IBAction)onClickSubmitForgotPassword:(id)sender{
-    
-    [self startServiceToForgotPassword];
+    if (self.txtEmail.text.length==0) {
+        [ECSAlert showAlert:@"Please enter valid email id."];
+    }else{
+         [self startServiceToForgotPassword];
+    }
+   
 }
 -(void)startServiceToForgotPassword
 {
@@ -157,20 +165,22 @@
     NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
     if(response.isValid)
     {
-          self.viewForgotPassword.hidden=YES;
-        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Successfully LoggedIn"]) {
+        
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Your password has been changed successfully."]) {
          
-            
-            
+             self.viewForgotPassword.hidden=YES;
+             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }else{
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue!"];
     
 }
 
-
+-(IBAction)hideForgotView:(id)sender{
+    self.viewForgotPassword.hidden=YES;
+}
 
 
 

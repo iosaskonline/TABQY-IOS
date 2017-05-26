@@ -26,6 +26,7 @@
 #import "TableAssociatedCell.h"
 #import "CompleteOrderVC.h"
 #import "SearchFoodVC.h"
+#import "MVYSideMenuController.h"
 @interface MenuCousineVC ()
 {
     NSMutableArray *arrayCusine;
@@ -54,6 +55,8 @@
 @property(strong,nonatomic) NSMutableArray *arrayFood;
 @property (weak, nonatomic) IBOutlet UICollectionView *segmentedCollectionView;
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage;
+@property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage2;
+
 
 @property(strong,nonatomic)IBOutlet UIView *viewAssociatedItem;
 @end
@@ -110,10 +113,13 @@
      {
          // [self.activityProfileImage stopAnimating];
      }];
-    
+    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+     {
+         // [self.activityProfileImage stopAnimating];
+     }];
     [self.segmentedCollectionView setPagingEnabled:YES];
     
-   [self startServiceToGetCousine];
+  // [self startServiceToGetCousine];
 }
 
 
@@ -239,6 +245,16 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     [self.view layoutIfNeeded];
+    arrayCusine=[[NSMutableArray alloc]init];
+    arrayfoodType=[[NSMutableArray alloc]init];
+    self.arraySelected=[[NSMutableArray alloc]init];
+    self.arraySelectedCosine=[[NSMutableArray alloc]init];
+    self.arraySelectedfoodType=[[NSMutableArray alloc]init];
+    self.arraySelectedfoodSave=[[NSMutableArray alloc]init];
+    self.arraySelectedfoodIdsSave=[[NSMutableArray alloc]init];
+    self.arrayAssociated=[[NSMutableArray alloc]init];
+    self.arraySelectedAssociatedItem=[[NSMutableArray alloc]init];
+     [self startServiceToGetCousine];
       [self.segmentedCollectionView scrollToItemAtIndexPath:inxPath atScrollPosition:UICollectionViewScrollPositionCenteredVertically animated:YES];
 
 }
@@ -277,7 +293,8 @@
     NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
     if(response.isValid)
     {
-        
+        arrayCusine=[[NSMutableArray alloc]init];
+
         NSArray *arr=[rootDictionary valueForKey:@"cusinie"];
         for (NSDictionary * dictionary in arr)
         {
@@ -523,6 +540,10 @@
         [cell.btnAdd addTarget:self action:@selector(clickToAdd:) forControlEvents:UIControlEventTouchUpInside];
           [cell.btnDelete addTarget:self action:@selector(clickToSubt:) forControlEvents:UIControlEventTouchUpInside];
         
+        [cell.btnCheck addTarget:self action:@selector(clickToaddInCart:) forControlEvents:UIControlEventTouchUpInside];
+        
+
+        
         BOOL flag=   [_arraySelected containsObject:
                       [NSString stringWithFormat:@"%li",indexPath.row]];
         
@@ -546,13 +567,16 @@
         
         cell.btnAdd.tag=indexPath.row;
          cell.btnDelete.tag=indexPath.row;
+        cell.btnCheck.tag=indexPath.row;
         if (object.foodCount.length) {
              cell.lblCount.text=object.foodCount;
             if ([cell.lblCount.text isEqualToString:@"0"]) {
-                [cell.btnCheck setImage:[UIImage imageNamed:@"tick_icon_unselected.png"] forState:UIControlStateNormal];
+            [cell.btnCheck setImage:[UIImage imageNamed:@"tick_icon_unselected.png"] forState:UIControlStateNormal];
             }else
              [cell.btnCheck setImage:[UIImage imageNamed:@"tick_icon.png"] forState:UIControlStateNormal];
-        }else{
+        }
+        
+        else{
             
              cell.lblCount.text=@"0";
         }
@@ -687,8 +711,25 @@
     }else{
           self.viewAssociatedItem.hidden=YES;
     }
-
+    
+   
+        [self.arraySelectedfoodSave addObject:object];
+        [self.arraySelectedfoodIdsSave addObject:object.foodId];
+        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:object];
+        
+        NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
+        [[NSUserDefaults standardUserDefaults]setObject:data forKey:strForKey];
+        [[NSUserDefaults standardUserDefaults]synchronize];
   
+    NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
+   NSArray *uniquearray = [[NSSet setWithArray:oldFoodIdArr] allObjects];
+
+    [self saveFoodIdwithOldfoodIdList:uniquearray];
+    
+//        [[NSUserDefaults standardUserDefaults]setObject:self.arraySelectedfoodIdsSave  forKey:@"oldFoodId"];
+//        [[NSUserDefaults standardUserDefaults]synchronize];
+    
+   
     
     [self.tblFood reloadData];
     [self.tblAssociatedItems reloadData];
@@ -718,8 +759,6 @@
             [[NSUserDefaults standardUserDefaults]setObject:@"" forKey:strForKey];
             [self.arraySelectedAssociatedItem removeObject:strContact];
     
-    
-    
         }
     NSLog(@"_arraySelected %@",_arraySelected);
     
@@ -727,6 +766,84 @@
     
     
 }
+
+
+- (IBAction)clickToaddInCart:(id)sender {
+    
+    UIButton *btn=(UIButton *)sender;
+    NSString *strContact=  [NSString stringWithFormat:@"%li",btn.tag];
+    BOOL flag=   [self.arraySelected containsObject:strContact];
+    
+  //  AssociatedFoodObject *object=[self.arrayAssociated objectAtIndex:btn.tag];
+    if(flag == NO )
+    {
+//        NSArray *array=[[NSSet setWithArray:self.arraySelected] allObjects];
+//        for (int i=0; i<array.count; i++) {
+//            NSString *abc=[array objectAtIndex:i];
+            FoodObject *object=[self.arrayFood objectAtIndex:btn.tag];
+        
+        if (object.foodCount==0) {
+            object.foodCount=@"1";
+            //[ECSToast showToast:@"Please add number of item First" view:self.view];
+        }else{
+            [self.arraySelectedfoodSave addObject:object];
+            [self.arraySelectedfoodIdsSave addObject:object.foodId];
+            NSData * data = [NSKeyedArchiver archivedDataWithRootObject:object];
+            
+            NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
+            [[NSUserDefaults standardUserDefaults]setObject:data forKey:strForKey];
+            [[NSUserDefaults standardUserDefaults]synchronize];
+            
+       // }
+        
+//        NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
+//        [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
+     
+        [[NSUserDefaults standardUserDefaults]setObject:self.arraySelectedfoodIdsSave  forKey:@"oldFoodId"];
+        [[NSUserDefaults standardUserDefaults]synchronize];
+        }
+        
+        [self.arraySelected addObject:strContact];
+    }
+    else {
+        
+
+        FoodObject *object=[self.arrayFood objectAtIndex:btn.tag];
+
+        object.foodCount= @"0";
+        
+        NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",[object.foodId integerValue]];
+        
+        for (NSDictionary * dictionary in object.associatedFood)
+        {
+            
+            AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
+            NSString *strForKeyAsso=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
+            
+            
+            [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKeyAsso];
+            
+        }
+        
+        [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
+        
+
+        [self.arraySelected removeObject:strContact];
+        
+        
+        
+    }
+    
+    NSLog(@"_arraySelected %@",_arraySelected);
+    
+    [self.tblFood reloadData];
+}
+-(void)clickToRemove:(id)sender{
+    UIButton *btn=(UIButton *)sender;
+    
+    
+}
+
 
 - (IBAction)clickToSubt:(id)sender {
     
@@ -740,10 +857,33 @@
         NSInteger c=a-b;
         NSString *st = [NSString stringWithFormat:@"%ld", (long)c];
         if (c<=0) {
-                    [_arraySelected removeObject:strContact];
+            [_arraySelected removeObject:strContact];
              object.foodCount= @"0";
+            
+            NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",[object.foodId integerValue]];
+            
+            for (NSDictionary * dictionary in object.associatedFood)
+            {
+                
+                AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
+                NSString *strForKeyAsso=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
+                
+                
+                [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKeyAsso];
+                
+            }
+            
+            [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
+            
         }else{
         object.foodCount= st;
+            [self.arraySelectedfoodSave addObject:object];
+            [self.arraySelectedfoodIdsSave addObject:object.foodId];
+            NSData * data = [NSKeyedArchiver archivedDataWithRootObject:object];
+            
+            NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
+            [[NSUserDefaults standardUserDefaults]setObject:data forKey:strForKey];
+            [[NSUserDefaults standardUserDefaults]synchronize];
         }
 
     NSLog(@"_arraySelected %@",_arraySelected);
@@ -781,7 +921,12 @@
         
         [self.tblCousine reloadData];
 
-    }else{
+    }
+    
+    else if (tableView==self.tblAssociatedItems){
+        
+    }
+    else{
         FoodObject*obj=[_arrayFood objectAtIndex:indexPath.row];
         FoodDetailVC *nav=[[FoodDetailVC alloc]initWithNibName:@"FoodDetailVC" bundle:nil];
         nav.foodId=obj.foodId;
@@ -844,7 +989,7 @@
     [[NSUserDefaults standardUserDefaults]setObject:self.arraySelectedfoodIdsSave  forKey:@"oldFoodId"];
     [[NSUserDefaults standardUserDefaults]synchronize];
     
-     [self.arraySelectedfoodIdsSave removeAllObjects];
+    // [self.arraySelectedfoodIdsSave removeAllObjects];
 }
 
 -(IBAction)onClickCancel:(id)sender{
@@ -855,7 +1000,18 @@
     self.viewAssociatedItem.hidden=YES;
 }
 
-
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 -(IBAction)onClickBack:(id)sender{
     [self.navigationController popViewControllerAnimated:YES];
 }

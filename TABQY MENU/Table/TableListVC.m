@@ -21,6 +21,7 @@
 #import "TableListObject.h"
 #import "MenuItemVC.h"
 #import "SearchFoodVC.h"
+#import "MVYSideMenuController.h"
 @interface TableListVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 
@@ -38,7 +39,8 @@
     // Do any additional setup after loading the view from its nib.
     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Tables",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -82,6 +84,7 @@
     {
         
         NSArray *arr=[rootDictionary valueForKey:@"waitertable"];
+         [ECSToast showToast:[rootDictionary valueForKey:@"msg"] view:self.view];
         for (NSDictionary * dictionary in arr)
         {
             TableListObject  *object=[TableListObject instanceFromDictionary:dictionary];
@@ -121,27 +124,39 @@
     
     
     TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
-  
+    if ([connectionObject.Booked isEqualToString:@"booked"]) {
+        cell.img_view.image = [UIImage imageNamed:@"selected2.png"];
+
+    }else{
     cell.img_view.image = [UIImage imageNamed:@"table_icon12.png"];
     
-    
+    }
     cell.lblName.text=connectionObject.tableName;
     
     [cell.lblName setFontKalra:13];
    
-    
-    
     
     return cell;
 }
 - (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath
 {
     
-    MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
-      TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
-    [ECSUserDefault saveString:connectionObject.tableName ToUserDefaultForKey:@"tablename"];
-    [ECSUserDefault saveString:connectionObject.tableId ToUserDefaultForKey:@"tableId"];
-    [self.navigationController pushViewController:menuVC animated:YES];
+    TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
+    if ([connectionObject.Booked isEqualToString:@"booked"]) {
+       // cell.img_view.image = [UIImage imageNamed:@"selected2.png"];
+     [ECSToast showToast:@"already booked.Please choose another table" view:self.view];
+        [self.menuCollectionView reloadData];
+        
+    }else{
+       // cell.img_view.image = [UIImage imageNamed:@"table_icon12.png"];
+        MenuItemVC *menuVC=[[MenuItemVC alloc]initWithNibName:@"MenuItemVC" bundle:nil];
+        TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
+        [ECSUserDefault saveString:connectionObject.tableName ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:connectionObject.tableId ToUserDefaultForKey:@"tableId"];
+        [self.navigationController pushViewController:menuVC animated:YES];
+    }
+    
+    
 
     
     
@@ -165,7 +180,18 @@
     
 }
 
-
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

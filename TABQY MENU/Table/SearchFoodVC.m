@@ -19,6 +19,7 @@
 #import "PlaceOrderVC.h"
 #import "AssociatedFoodObject.h"
 #import "FoodDetailVC.h"
+#import "MVYSideMenuController.h"
 @interface SearchFoodVC ()
 {
        NSString *foodIdSelected;
@@ -54,7 +55,8 @@
     NSString *scrName=[NSString stringWithFormat:@"%@ Search Food",self.appUserObject.resturantName];
     [self settingTopView:self.viewTop onController:self andTitle:scrName andImg:@"arrow-left.png"];
     NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -469,6 +471,19 @@
     
 }
 
+
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

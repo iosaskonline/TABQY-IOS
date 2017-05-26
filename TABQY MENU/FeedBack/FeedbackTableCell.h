@@ -16,7 +16,7 @@
 @property (weak, nonatomic) IBOutlet UIView *viewRadiotype2;
 @property (weak, nonatomic) IBOutlet UIView *viewtextEntryType;
 
-
+@property (weak, nonatomic) IBOutlet UITextField *txtAnswer;
 
 @property (weak, nonatomic) IBOutlet UIButton *btnRadioYes;
 @property (weak, nonatomic) IBOutlet UIButton *btnRadioNo;

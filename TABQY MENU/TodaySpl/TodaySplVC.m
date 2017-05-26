@@ -6,7 +6,7 @@
 //  Copyright © 2017 ASK ONLINE . All rights reserved.
 //
 
-#import "TodaySplVC.h"
+#import "TodaySplVC.h"  `
 #import "AppUserObject.h"
 #import "UIExtensions.h"
 #import "ECSServiceClass.h"
@@ -19,6 +19,7 @@
 #import "TableAssociatedCell.h"
 #import "SearchFoodVC.h"
 #import "FoodDetailVC.h"
+#import "MVYSideMenuController.h"
 @interface TodaySplVC ()
 {
     NSString *foodIdSelected;
@@ -287,7 +288,7 @@
         
         //[arrayfoodType addObjectsFromArray:arrayfoodType];
         [self.tblFood reloadData];
-        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Food not found!"]) {
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Today Special not found!"]) {
             
             self.tblFood.hidden=YES;
             
@@ -483,6 +484,19 @@
     
     SearchFoodVC *spl=[[SearchFoodVC alloc ]initWithNibName:@"SearchFoodVC" bundle:nil];
     [self.navigationController pushViewController:spl animated:YES];
+    
+}
+
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
     
 }
 /*

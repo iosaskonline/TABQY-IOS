@@ -18,6 +18,7 @@
 #import "SegmentedCell.h"
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
+#import "MVYSideMenuController.h"
 @interface OrderProgressVC ()<UIActionSheetDelegate>
 {
     NSIndexPath *inxPath;
@@ -242,7 +243,7 @@
     {
         
         self.arrayOrderProgress=[[NSMutableArray alloc]init];
-       
+        self.dictFood=[rootDictionary valueForKey:@"food_orders_name"];
         NSArray *arr=[rootDictionary valueForKey:@"order_progess"];
         for (NSDictionary * dictionary in arr)
         {
@@ -256,6 +257,9 @@
         NSLog(@"arrayCompletedOrder=%@",self.arrayCompletedOrder);
         NSLog(@"arrayOrderProgress=%@",self.arrayOrderProgress);
         [self.tblProgress reloadData];
+    }
+    if ([[rootDictionary  valueForKey:@"msg"] isEqualToString:@"No orderd Found"]) {
+        [ECSToast showToast:@"No Order in progress." view:self.view];
     }
     
     else [ECSAlert showAlert:@"Error!"];
@@ -413,6 +417,10 @@
            // [ECSAlert showAlert:@"No Order in progress."];
            // return ;
         }
+        
+        if ([[rootDictionary objectForKey:@"waitertable"] isKindOfClass:[NSNull class]]) {
+           //
+        }else{
         NSArray *arr=[rootDictionary valueForKey:@"waitertable"];
             for (NSDictionary * dictionary in arr)
             {
@@ -425,7 +433,7 @@
                 
             }
         
-       
+        }
         
         
             TableListObject *homeDelivery=[[TableListObject alloc]init];
@@ -489,7 +497,18 @@
 
 
 
-
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 
 
 @end

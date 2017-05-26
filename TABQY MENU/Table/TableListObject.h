@@ -12,6 +12,7 @@
     NSString *restaurentId;
     NSString *tableId;
     NSString *tableName;;
+    NSString *Booked;
     
 }
 
@@ -19,6 +20,7 @@
 @property (nonatomic, copy) NSString *restaurentId;
 @property (nonatomic, copy) NSString *tableId;
 @property (nonatomic, copy) NSString *tableName;
+@property (nonatomic, copy) NSString *Booked;
 
 + (TableListObject *)instanceFromDictionary:(NSDictionary *)aDictionary;
 - (void)setAttributesFromDictionary:(NSDictionary *)aDictionary;

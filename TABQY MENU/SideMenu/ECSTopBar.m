@@ -19,6 +19,7 @@
 @property (weak, nonatomic) IBOutlet UILabel *lblHeading;
 @property (weak, nonatomic) IBOutlet UIButton *btnCart;
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
+@property (weak, nonatomic) IBOutlet UIButton *btnMenu;
 @property (weak, nonatomic) NSString *imagestr;
 @property (weak, nonatomic) IBOutlet UIButton *btnRight;
 @property (weak, nonatomic) IBOutlet UIImageView *imgLogo;
@@ -67,11 +68,6 @@
    
          [self.lblHeading setText:self.heading];
 
-    
-    //self.lblHeading.textColor=[UIColor blackColor];
-         // self.lblHeading.text=@"One";
-    
-     //[self.lblHeading setFontKalra:22];
         if (self.appUserObject.resturantLogo ==(id)[NSNull null] ||[self.appUserObject.resturantLogo isEqualToString:@""]) {
             NSLog(@"ttt %@",self.appUserObject.resturantLogo);
            // [self.btnEdit setButtonTitle:@"Upload"];
@@ -92,11 +88,12 @@
     }
    
     
-       UIImage *btnImage = [UIImage imageNamed:self.imagestr];
-       [self.btnBack setImage:btnImage forState:UIControlStateNormal];
+//       UIImage *btnImage = [UIImage imageNamed:self.imagestr];
+//       [self.btnMenu setImage:btnImage forState:UIControlStateNormal];
     
     
-    if ([self.imagestr isEqualToString:@"menu-icon.png"] ) {
+    if ([self.imagestr isEqualToString:@"nav_header_icon.png"] ) {
+        self.btnBack.hidden=YES;
           [self.view setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
     }else{
         UIImage *btnImage = [UIImage imageNamed:@"menu-icon.png"];
@@ -121,7 +118,7 @@
 - (IBAction)clickToOpenSideMenu:(id)sender
 {
     //[self.delegate addClubsToBounce:self.arraySelectedClubs];
-    //[self.navigationController popViewControllerAnimated:YES];
+   // [self.navigationController popViewControllerAnimated:YES];
     
     if([self.controller canPerformAction:@selector(openSideMenuButtonClicked:) withSender:sender])
     {
@@ -130,7 +127,7 @@
     else
     {
          
-         [self.controller.navigationController popViewControllerAnimated:YES];
+         [self.controller.navigationController popViewControllerAnimated:NO];
     }
 }
 
@@ -149,7 +146,7 @@
     else
     {
        
-        [self.controller.navigationController popViewControllerAnimated:YES];
+      //  [self.controller.navigationController popViewControllerAnimated:YES];
     }
 }
 
@@ -171,6 +168,21 @@
 }
 
 
+- (IBAction)clickToBack:(id)sender
+{
+    //[self.delegate addClubsToBounce:self.arraySelectedClubs];
+    //[self.navigationController popViewControllerAnimated:YES];
+    
+    if([self.controller canPerformAction:@selector(clickTobackVC:) withSender:sender])
+    {
+        [self.controller performSelector:@selector(clickTobackVC:) withObject:sender];
+    }
+    else
+    {
+        
+        [self.controller.navigationController popViewControllerAnimated:NO];
+    }
+}
 
 
 

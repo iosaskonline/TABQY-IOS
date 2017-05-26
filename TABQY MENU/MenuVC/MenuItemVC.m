@@ -17,6 +17,7 @@
 #import "MenuCousineVC.h"
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
+#import "MVYSideMenuController.h"
 @interface MenuItemVC (){
     NSMutableArray *arrMenuItem;
 }
@@ -35,7 +36,7 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     arrMenuItem=[[NSMutableArray alloc]init];
-     // [self.viewTop setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
+    
      [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Menu",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     [self.lblHeader setText:[NSString stringWithFormat:@"%@ Menu",self.appUserObject.resturantName]];
     
@@ -175,9 +176,9 @@
     }
     NSLog(@"menuItem %@",arrMenuItem);
     [self.menuCollectionView reloadData];
-    if ([[responseDict objectForKey:@"msg"] isEqualToString:@"Successfully LoggedIn"]) {
+    if ([[responseDict objectForKey:@"msg"] isEqualToString:@"Menu not found!"]) {
 
-       
+        [ECSToast showToast:@"Menu not found!" view:self.view];
         //[self.navigationController popViewControllerAnimated:YES];
     }
     else if ([success isEqualToString:@"false"]) {
@@ -316,7 +317,16 @@
     
     NSLog(@"placeOrderClicked");
 }
-
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 
 
 /*

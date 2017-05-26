@@ -19,6 +19,7 @@
 #import "AssociatedFoodObject.h"
 #import "SearchFoodVC.h"
 #import "FoodDetailVC.h"
+#import "MVYSideMenuController.h"
 @interface HotDealVC ()
 {
        NSString *foodIdSelected;
@@ -273,7 +274,7 @@
         
         //[arrayfoodType addObjectsFromArray:arrayfoodType];
         [self.tblFood reloadData];
-        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Food not found!"]) {
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Hot Deals not found!"]) {
             
             self.tblFood.hidden=YES;
             
@@ -461,6 +462,19 @@
     // Dispose of any resources that can be recreated.
 }
 
+
+-(void)openSideMenuButtonClicked:(UIButton *)sender{
+    
+    MVYSideMenuController *sideMenuController = [self sideMenuController];
+    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+    if (sideMenuController) {
+        
+        [sideMenuController openMenu];
+    }
+    
+}
 /*
 #pragma mark - Navigation
 
