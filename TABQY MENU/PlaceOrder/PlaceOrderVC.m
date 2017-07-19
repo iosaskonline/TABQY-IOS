@@ -22,7 +22,8 @@
 #import "MenuItemVC.h"
 #import "SearchFoodVC.h"
 #import "MVYSideMenuController.h"
-@interface PlaceOrderVC (){
+#import "PrintInvoiceVC.h"
+@interface PlaceOrderVC ()<UIAlertViewDelegate>{
     CGFloat Price;
     CGFloat totalpriceWithoutVat;
     CGFloat anotheItemPrice;
@@ -36,6 +37,7 @@
     NSString *vatPricetotal;
     NSString *taxPrice;
     NSString *tbleId;
+    NSString *orderNumber;
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 
@@ -68,12 +70,21 @@
     [super viewDidLoad];
     
     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Place Order",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
-    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -89,6 +100,24 @@
     tbleId=tableid;
     [self getOpdatedList];
     [self startServiceToGetAllTable];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveNavigateToRootVC:)
+                                                 name:@"NavigateToRootVC"
+                                               object:nil];
+}
+
+- (void) receiveNavigateToRootVC:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"NavigateToRootVC"])
+        NSLog (@"Successfully received the test notification!");
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 -(void)getOpdatedList{
@@ -118,8 +147,8 @@
                 if ([associatedItem isEqualToString:@"selected"]) {
                     NSMutableDictionary *dictAssociate=[[NSMutableDictionary alloc]init];
                     [dictAssociate setValue:associatedFoodObject.associatedFoodId forKey:@"asscioted_food_id"];
-                [dictAssociate setValue:associatedFoodObject.associatedFoodName forKey:@"asscioted_food_name"];
-                [dictAssociate setValue:associatedFoodObject.associatedFoodCode forKey:@"asscioted_food_code"];
+                    [dictAssociate setValue:associatedFoodObject.associatedFoodName forKey:@"asscioted_food_name"];
+                    [dictAssociate setValue:associatedFoodObject.associatedFoodCode forKey:@"asscioted_food_code"];
                     [dictAssociate setValue:associatedFoodObject.associatedFoodPrice forKey:@"asscioted_price"];
                     [dictAssociate setValue:@"1" forKey:@"asscioted_qty"];
                     assoPreviousItemPrice=associatedFoodObject.associatedFoodPrice.floatValue ;
@@ -188,6 +217,7 @@
     }else{
          self.tblOrder.hidden=YES;
     }
+    
     [self.tblOrder reloadData];
     
 }
@@ -204,7 +234,7 @@
     if (tableView==self.tblOrder) {
         return 200;
     }else
-        return 50;
+        return 44;
     
 }
 
@@ -228,8 +258,17 @@
     cell.lblFoodName.text=object.foodName;
     NSLog(@"Foodname=%@",object.foodName);
     NSString *strimage = object.foodImage;
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.foodImage];
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.foodImage];
     
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,FOODIMAGE,object.foodImage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",FOODIMAGE,object.foodImage];
+        }
+        
     if ([strimage isKindOfClass:[NSNull class]]) {
         cell.imgFood.image = [UIImage imageNamed:@"Pasted image.png"];
         
@@ -332,7 +371,12 @@
         [self.tblAllTable setSeparatorStyle:UITableViewCellSeparatorStyleNone];
         cell.lbltableName.text=[NSString stringWithFormat:@"Table %ld",(long)indexPath.row];
         TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
-        
+        if ([connectionObject.Booked isEqualToString:@"booked"]) {
+            // cell.img_view.image = [UIImage imageNamed:@"selected2.png"];
+            cell.backgroundColor=[UIColor lightGrayColor];
+        }else{
+             cell.backgroundColor=[UIColor whiteColor];
+        }
         
         NSLog(@"hello");
         
@@ -349,6 +393,7 @@
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (tableView==self.tblAllTable) {
+        self.viewAllTable.hidden=YES;
         TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
         if ([connectionObject.Booked isEqualToString:@"booked"]) {
            // cell.img_view.image = [UIImage imageNamed:@"selected2.png"];
@@ -437,8 +482,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@home_delivery",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@home_delivery",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@home_delivery",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@home_delivery",SERVERURLPATH]];
     //{"user_id": "23","resturant_id": "4","type": "1","status": "0","total_price":"450","sales_tax":"9.4","service_tax":"8.46","payable_amount":"111.8","orders": [{"food_id": "3","name": "Hamburger","food_code": "hamburger","qty": 1,"price": 70,"items": [{"asscioted_food_id": "1","asscioted_food_name":"Curd001","asscioted_food_code": "Curd-123","asscioted_qty": 2,"asscioted_price": "40"}, {"asscioted_food_id": "3","asscioted_food_name": "Ratia","asscioted_food_code": "Ratia-123","asscioted_qty": 1,"asscioted_price": 0}]}, {"food_id ": "8","food_code": "biryani01","name": "Dum Biryani","qty": 1,"price ": "30","items": null}]}
     NSString *pricewithTax=[NSString stringWithFormat:@"%.2f",Price];
 
@@ -487,7 +537,7 @@
         [self.navigationController pushViewController:nav animated:YES];
         
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -507,6 +557,7 @@
     if ([tbleId isEqualToString:@""]||tbleId==nil) {
         
         if (self.arrayTable.count) {
+            self.viewAllTable.hidden=NO;
             self.viewAllTable.frame=CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
             self.viewAllTable.hidden=NO;
             [self.view addSubview:self.viewAllTable];
@@ -543,7 +594,13 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     
-    [class setServiceURL:[NSString stringWithFormat:@"%@add_food_orders",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@add_food_orders",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@add_food_orders",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@add_food_orders",SERVERURLPATH]];
     
    // {"user_id": "23","resturant_id": "4","table_id": "9","type": "2","status": "1","total_price":"450","sales_tax":"9.4","service_tax":"8.46","payable_amount":"111.8","orders": [{"food_id": "3","name": "Hamburger","food_code": "hamburger","qty": 1,"price": 70,"items": [{"asscioted_food_id": "1","asscioted_food_name": "Curd-001","asscioted_food_code": "Curd-123","asscioted_qty": 2,"asscioted_price": "40"}, {"asscioted_food_id": "3","asscioted_food_name": "Ratia","asscioted_food_code": "Ratia-123","asscioted_qty": 1,"asscioted_price": 0}]}, {"food_id ": "8","food_code": "biryani01","name": "Dum Biryani","qty": 1,"price ": "30","items": null}]}
     
@@ -600,16 +657,54 @@
 //        [self.navigationController pushViewController:nav animated:YES];
         
         if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Order Successfully"]) {
-            [ECSAlert showAlert:@"Order Successfully"];
+            //[ECSAlert showAlert:@"Order Submitted Successfully"];
             [self removeAllSaveData];
-                    [self.navigationController popToRootViewControllerAnimated:YES];
+            orderNumber=[rootDictionary objectForKey:@"order_no"];
+            
+//            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Order Submitted"
+//                                                            message:@"Do you want to generate receipt for kitchen ?."
+//                                                           delegate:self
+//                                                  cancelButtonTitle:@"Cancel"
+//                                                  otherButtonTitles:@"Ok"];
+//            [alert show];
+//            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Order Submitted!"
+//                                                                message:@"Print receipt for kitchen."
+//                                                               delegate:self
+//                                                      cancelButtonTitle:nil
+//                                                      otherButtonTitles:@"Ok", nil];
+//            [alertView show];
+        
+            PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+            //nav.orderObj=self.orderObj;
+            nav.orderNumber=orderNumber;
+            nav.selectedPrinter=@"kitchen";
+            [self.navigationController pushViewController:nav animated:YES];
 
         }else{
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+
+    else [ECSAlert showAlert:@"Server Issue."];
     
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    // the user clicked OK
+    if (buttonIndex == 0) {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToRootVC" object:nil];
+//        
+//        [self.navigationController popToRootViewControllerAnimated:YES];
+        PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+        //nav.orderObj=self.orderObj;
+        nav.orderNumber=orderNumber;
+        nav.selectedPrinter=@"kitchen";
+        [self.navigationController pushViewController:nav animated:YES];
+    }else{
+        
+        
+   
+    }
 }
 
 -(void)startServiceToGetAllTable
@@ -626,7 +721,14 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     
-    [class setServiceURL:[NSString stringWithFormat:@"%@table_assign_to_waiter",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@table_assign_to_waiter",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@table_assign_to_waiter",@"tabqy.com",SERVERURLPATH]];
+    }
+
+   // [class setServiceURL:[NSString stringWithFormat:@"%@table_assign_to_waiter",SERVERURLPATH]];
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.user_id, @"user_id",
@@ -656,7 +758,7 @@
         [self.tblAllTable reloadData];
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -669,24 +771,32 @@
     NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
     NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
     
+    NSLog(@"ooldFoodid %@",ooldFoodid);
+    
     for (int i=0; i<ooldFoodid.count; i++) {
         NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
         [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
         
-        FoodObject *object=[self.orderArray objectAtIndex:i];
-        for (NSDictionary * dictionary in object.associatedFood)
-        {
-            
-            AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
-            NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
-            
-            
-            [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
-            
-        }
+        for (int j=0; j< self.orderArray.count; j++) {
+            FoodObject *object=[self.orderArray objectAtIndex:j];
+            for (NSDictionary * dictionary in object.associatedFood)
+            {
+                
+                AssociatedFoodObject  *associatedFoodObject=[AssociatedFoodObject instanceFromDictionary:dictionary];
+                NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[object.foodId integerValue],(long)[associatedFoodObject.associatedFoodId integerValue]];
+                
+                
+                [ECSUserDefault RemoveObjectFromUserDefaultForKey:strForKey];
+                
+            }
 
+        }
+        
+       
     }
     [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
+//    [[NSUserDefaults standardUserDefaults]setObject:@""  forKey:@"oldFoodId"];
+//    [[NSUserDefaults standardUserDefaults]synchronize];
     [self getOpdatedList];
 }
 
@@ -701,16 +811,16 @@
     [self.navigationController pushViewController:spl animated:YES];
     
 }
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-   
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
-    
-}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//   
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 
 -(IBAction)onclickBg:(id)sender{
      self.viewAllTable.hidden=YES;

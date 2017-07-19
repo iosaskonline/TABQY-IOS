@@ -14,6 +14,7 @@
 #import "ECSServiceClass.h"
 #import "UIExtensions.h"
 #import "SearchFoodVC.h"
+#import "PrintInvoiceVC.h"
 @interface HomeDeliveryVC ()
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 @property (weak, nonatomic) IBOutlet TPKeyboardAvoidingScrollView *scroll_addContact;
@@ -35,25 +36,33 @@
     [super viewDidLoad];
     
    // [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Home Delivery",self.appUserObject.resturantName] andImg:@"arrow.png"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+  //  NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
     
     // self.scroll_addContact.contentSize = CGSizeMake(self.scroll_addContact.frame.size.width, 1000);
     
+
     
-    NSLog(@"dict %@",_dict);
     self.txtDate.text=[_dict valueForKey:@"order_date"];
     self.txtTime.text=[self.dict valueForKey:@"order_time"];
+   // self.txtTime.text=date;
     self.txtOrderId.text=[self.dict valueForKey:@"order_no"];
     self.txtTotalCast.text=[NSString stringWithFormat:@"%@ %@",self.appUserObject.resturantCurrency,[self.dict valueForKey:@"total_cost"]];
     
-    
-    
-    
-    
+
     // Do any additional setup after loading the view from its nib.
 }
 
@@ -66,16 +75,16 @@
 
 
 -(IBAction)onClickSubmitHomeDeliveryOrder:(id)sender{
-    if (self.txtCusName.text.length<=0) {
-           [ECSToast showToast:@"Please enter customer name." view:self.view];
-    }
-    else if( !(self.txtCusPh.text.length)){
-        [ECSToast showToast:@"Please enter customer  valid Ph. number." view:self.view];
-    }
-    else if(self.txtCusAdd.text.length<=0){
-        [ECSToast showToast:@"Please enter customer address." view:self.view];
-    }
-    else
+//    if (self.txtCusName.text.length<=0) {
+//           [ECSToast showToast:@"Please enter customer name." view:self.view];
+//    }
+//    else if( !(self.txtCusPh.text.length)){
+//        [ECSToast showToast:@"Please enter customer  valid Ph. number." view:self.view];
+//    }
+//    else if(self.txtCusAdd.text.length<=0){
+//        [ECSToast showToast:@"Please enter customer address." view:self.view];
+//    }
+//    else
     [self startServiceToGetCustomerDetail];
     
 }
@@ -93,8 +102,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@customer_information",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@customer_information",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@customer_information",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@customer_information",SERVERURLPATH]];
    
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.txtOrderId.text, @"order_no",
@@ -122,11 +136,41 @@
     if(response.isValid)
     {
         [self removeAllSaveData];
-        [ECSToast showToast:[rootDictionary valueForKey:@"msg"] view:self.view];
-        [self.navigationController popToRootViewControllerAnimated:YES];
+       // [ECSToast showToast:[rootDictionary valueForKey:@"msg"] view:self.view];
+       // [ECSAlert showAlert:[rootDictionary valueForKey:@"msg"]];
+//        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Order Submitted!"
+//                                                            message:@"Print receipt for kitchen."
+//                                                           delegate:self
+//                                                  cancelButtonTitle:nil
+//                                                  otherButtonTitles:@"Ok", nil];
+//        [alertView show];
+        PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+        //nav.orderObj=self.orderObj;
+        nav.orderNumber=self.txtOrderId.text;
+        nav.selectedPrinter=@"kitchen";
+        [self.navigationController pushViewController:nav animated:YES];
+       
+       // [self.navigationController popToRootViewControllerAnimated:YES];
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
+}
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    // the user clicked OK
+    if (buttonIndex == 0) {
+        //        [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToRootVC" object:nil];
+        //
+        //        [self.navigationController popToRootViewControllerAnimated:YES];
+        PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+        //nav.orderObj=self.orderObj;
+        nav.orderNumber=self.txtOrderId.text;
+        nav.selectedPrinter=@"kitchen";
+        [self.navigationController pushViewController:nav animated:YES];
+    }else{
+        
+        
+        
+    }
 }
 -(void)removeAllSaveData{
     NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];

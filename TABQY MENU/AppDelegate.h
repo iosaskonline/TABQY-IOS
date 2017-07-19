@@ -10,6 +10,8 @@
 #import <MapKit/MapKit.h>
 #import <AVFoundation/AVFoundation.h>
 #import <CoreLocation/CoreLocation.h>
+#import "AppUserObject.h"
+#import "ECSBaseViewController.h"
 @class MVYSideMenuController;
 @interface AppDelegate : UIResponder <UIApplicationDelegate,CLLocationManagerDelegate>
 

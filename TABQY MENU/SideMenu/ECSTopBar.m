@@ -21,7 +21,7 @@
 @property (weak, nonatomic) IBOutlet UIButton *btnBack;
 @property (weak, nonatomic) IBOutlet UIButton *btnMenu;
 @property (weak, nonatomic) NSString *imagestr;
-@property (weak, nonatomic) IBOutlet UIButton *btnRight;
+@property (strong, nonatomic) IBOutlet UIButton *btnRight;
 @property (weak, nonatomic) IBOutlet UIImageView *imgLogo;
 - (IBAction)clickToPlaceOrder:(id)sender;
 - (IBAction)clickToOpenSearch:(id)sender;
@@ -73,7 +73,15 @@
            // [self.btnEdit setButtonTitle:@"Upload"];
     
         }else{
-            NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
+            NSString *imgurl;
+            NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+           
+            if (selectedIp.length) {
+                imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORANTLOGO,self.appUserObject.resturantLogo];
+            }else{
+                imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORANTLOGO,self.appUserObject.resturantLogo];
+            }
+            
         [self.imgLogo ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
              {
                 // [self.activityProfileImage stopAnimating];
@@ -88,16 +96,34 @@
     }
    
     
-//       UIImage *btnImage = [UIImage imageNamed:self.imagestr];
-//       [self.btnMenu setImage:btnImage forState:UIControlStateNormal];
-    
+    NSString *string = self.heading;
+    if ([string containsString:@"Search Food"]) {
+        self.btnCart.hidden=YES;
+    }
     
     if ([self.imagestr isEqualToString:@"nav_header_icon.png"] ) {
-        self.btnBack.hidden=YES;
+       // self.btnBack.hidden=YES;
+        UIImage *btnImage = [UIImage imageNamed:self.imagestr];
+        [self.btnMenu setImage:btnImage forState:UIControlStateNormal];
+        
           [self.view setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
     }else{
-        UIImage *btnImage = [UIImage imageNamed:@"menu-icon.png"];
+        UIImage *btnImage = [UIImage imageNamed:@"icon_order_online.png"];
         [self.btnRight setImage:btnImage forState:UIControlStateNormal];
+        
+        if ([string containsString:@"Place Order"]||[string containsString:@"Order Progress"]||[string containsString:@"Order Histry"]||[string containsString:@"Tables"]||[string containsString:@"About"]||[string containsString:@"Feedback"]||[string containsString:@"Profile"]) {
+            self.btnRight.hidden=YES;
+            self.btnCart.frame=CGRectMake(self.btnCart.frame.origin.x+100, self.btnCart.frame.origin.y, self.btnCart.frame.size.width, self.btnCart.frame.size.height);
+        }else{
+             self.btnCart.frame=CGRectMake(self.btnCart.frame.origin.x, self.btnCart.frame.origin.y, self.btnCart.frame.size.width, self.btnCart.frame.size.height);
+            self.btnRight.hidden=NO;
+        }
+//home develiry
+        if ([string containsString:@"Print"]||[string containsString:@"home develiry"]) {
+            self.btnRight.hidden=YES;
+            self.btnCart.hidden=YES;
+        }
+        
     [self.view setBackgroundColor:[JKSColor  colorwithHexString:self.appUserObject.resturantColor alpha:1.0]];
     }
  
@@ -126,6 +152,8 @@
     }
     else
     {
+       
+        
          
          [self.controller.navigationController popViewControllerAnimated:NO];
     }

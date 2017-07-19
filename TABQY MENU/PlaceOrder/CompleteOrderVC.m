@@ -23,6 +23,7 @@
 #import "AssociatedFoods.h"
 #import "SearchFoodVC.h"
 #import "MVYSideMenuController.h"
+#import "PrintInvoiceVC.h"
 @interface CompleteOrderVC (){
     CGFloat Price;
     CGFloat anotheItemPrice;
@@ -43,6 +44,10 @@
     CGFloat assoPrice;
     CGFloat preAssoPrice;
     NSString *subtotal;
+     CGFloat grandValue;
+    
+    CGFloat coupon;
+    CGFloat initialvalue;
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
 
@@ -57,7 +62,10 @@
 @property(weak,nonatomic)IBOutlet UILabel *lblVatTotalPrice;
 @property(weak,nonatomic)IBOutlet UILabel *lblTotalPayablePrice;
 @property(weak,nonatomic)IBOutlet UILabel *lblselectedTable;
+@property(weak,nonatomic)IBOutlet UILabel *lblafterapplycoupon;
+@property(weak,nonatomic)IBOutlet UILabel *lblgrandTotal;
 
+@property(weak,nonatomic)IBOutlet UITextField *txtcoupon;
 
 @property(weak,nonatomic)IBOutlet UIButton *btnPrevious;
 @property(weak,nonatomic)IBOutlet UIButton *btnOnGoing;
@@ -74,11 +82,24 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    coupon=0;
+   initialvalue=0;
+    grandValue=0;
     allPreviousPriceWithTaxes=0;
     [self getOpdatedList];
     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Place Order",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+
+  //  NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -87,6 +108,7 @@
     tbleId=self.orderObj.tableId;
     self.arrayAssociatedItem=[[NSMutableArray alloc]init];
     
+    [self.scroll_addContact setContentSize:CGSizeMake(320, 1000)];
 
     
     if (self.orderObj.tableId.length||self.orderObj.orderNum.length) {
@@ -96,16 +118,29 @@
         [ECSUserDefault saveString:self.orderObj.tableId ToUserDefaultForKey:@"tableId"];
         [ECSUserDefault saveString:self.orderObj.orderNum ToUserDefaultForKey:@"orderNum"];
         if ([self.orderObj.tableName isEqualToString:@""]) {
-              self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",@"home develiry"];
+              self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",@"Home develiry"];
+            [ECSAlert showAlert:@"Can't add more order in home delivery.\nPlease complete this order."];
         }else{
          self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",self.orderObj.tableName];
         }
     }else{
         NSString *tableName=[ECSUserDefault getStringFromUserDefaultForKey:@"tablename"];
         NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
+        NSString *orderNum=[ECSUserDefault getStringFromUserDefaultForKey:@"orderNum"];
         if ([tableName isEqualToString:@""]) {
-            self.lblselectedTable.text=[NSString stringWithFormat:@"Order For table number"];
-        }else{
+            if (orderNum.length>1) {
+                if (self.arayjsonOrder.count) {
+                    [self removeAllSaveData];
+                    [ECSAlert showAlert:@"Can't add more order in home delivery.\nPlease complete this order."];
+                    
+                }
+           self.lblselectedTable.text=[NSString stringWithFormat:@"Order For Home develiry"];
+
+            }else{
+                self.lblselectedTable.text=[NSString stringWithFormat:@"Order For table number"];
+            }
+        }
+        else{
             self.lblselectedTable.text=[NSString stringWithFormat:@"Order For %@",tableName];
         }
         tbleId=tableid;
@@ -114,19 +149,50 @@
     
     
     selectedTab=YES;
-    [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
-    [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
+   
   
     
     if (self.selectedOrder.length) {
        orderNumber=self.selectedOrder;
     }
-    
-    
     [self startServiceToGetPreviousOrder];
+            [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
+            [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
+//    if (self.selectedOrder.length) {
+//        // [self startServiceToGetPreviousOrder];
+//        [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
+//        [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
+//        [self getOpdatedList];
+//    }else{
+//        [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
+//        [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
+//        
+//    }
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveNavigateToRootVC:)
+                                                 name:@"NavigateToRootVC"
+                                               object:nil];
+   
+}
+
+
+
+- (void) receiveNavigateToRootVC:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"NavigateToRootVC"])
+        NSLog (@"Successfully received the test notification!");
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 -(void)getOpdatedList{
+    selectedTab=NO;
     self.orderArray =[[NSMutableArray alloc]init];
     Price=0;
     anotheItemPrice=0;
@@ -267,8 +333,15 @@
         cell.lblFoodName.text=object.foodName;
         NSLog(@"Foodname=%@",object.foodName);
         NSString *strimage = object.foodImage;
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.foodImage];
+        //NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.foodImage];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
         
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,FOODIMAGE,object.foodImage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",FOODIMAGE,object.foodImage];
+        }
         if ([strimage isKindOfClass:[NSNull class]]) {
             cell.imgFood.image = [UIImage imageNamed:@"Pasted image.png"];
             
@@ -533,10 +606,21 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@re_food_orders",SERVERURLPATH]];
-    NSString *pricewithTax=[NSString stringWithFormat:@"%.2f",Price];
-    
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@re_food_orders",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@re_food_orders",@"tabqy.com",SERVERURLPATH]];
+    }
+
+   // [class setServiceURL:[NSString stringWithFormat:@"%@re_food_orders",SERVERURLPATH]];
+    NSString *pricewithTax;
+//    if (grandValue>0) {
+//    pricewithTax=[NSString stringWithFormat:@"%.2f",Price+allPreviousPriceWithTaxes];
+//    }else{
+        pricewithTax=[NSString stringWithFormat:@"%.2f",Price+allPreviousPriceWithTaxes];
+
+    //}
     NSString *priceWithouttax=[NSString stringWithFormat:@"%.2f",totalpriceWithoutVat];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.resturantId, @"resturant_id",
@@ -546,8 +630,6 @@
                                  @"0", @"status",
                                  priceWithouttax, @"total_price",
                                  orderNumber,@"order_no",
-                                 //@"0", @"sales_tax",
-                                 //taxPrice, @"service_tax",
                                  pricewithTax, @"payable_amount",
                                  self.arayjsonOrder, @"orders",
                                  nil];
@@ -580,8 +662,22 @@
     {
         if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Order Successfully"]) {
             [self removeAllSaveData];
-            [ECSAlert showAlert:@"Order Submitted Successfully"];
+            //[self  startServiceToGetPreviousOrder];
+           // [self onClickPreviousOrder:nil];
+//            UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Order Submitted!"
+//                                                                message:@"Print receipt for kitchen."
+//                                                               delegate:self
+//                                                      cancelButtonTitle:nil
+//                                                      otherButtonTitles:@"Ok", nil];
+//            [alertView show];
+           // [ECSAlert showAlert:@"Order Submitted Successfully"];
            // [self.navigationController popToRootViewControllerAnimated:YES];
+            
+            PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+            //nav.orderObj=self.orderObj;
+            nav.orderNumber=orderNumber;
+            nav.selectedPrinter=@"kitchen";
+            [self.navigationController pushViewController:nav animated:YES];
         }else if([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Table Id is Missing"]){
              [ECSAlert showAlert:@"Please complete this order."];
         }
@@ -589,9 +685,29 @@
             [ECSAlert showAlert:@"You have not added any On Going order!"];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    // the user clicked OK
+    if (buttonIndex == 0) {
+//        [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToRootVC" object:nil];
+//        
+//        [self.navigationController popToRootViewControllerAnimated:YES];
+      //  [self onClickPreviousOrder:nil];
+        PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+        //nav.orderObj=self.orderObj;
+        nav.orderNumber=orderNumber;
+        nav.selectedPrinter=@"kitchen";
+        [self.navigationController pushViewController:nav animated:YES];
+        
+    }else{
+        
+        
+       
+    }
+}
+
 
 //-(void)startServiceToGetAllTable
 //{
@@ -657,8 +773,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@previous_order",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@previous_order",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@previous_order",@"tabqy.com",SERVERURLPATH]];
+    }
+    //[class setServiceURL:[NSString stringWithFormat:@"%@previous_order",SERVERURLPATH]];
     //{"order_no": "McDon-01-1"}
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  orderNumber, @"order_no",
@@ -717,9 +838,16 @@
         
          self.lblTotalPayablePrice.text=[NSString stringWithFormat:@"Total payable amount :    %@ %.2f",self.appUserObject.resturantCurrency,total];
         [self.tblOrder reloadData];
+        
+        if (self.selectedOrder.length) {
+            // [self startServiceToGetPreviousOrder];
+            [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
+            [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
+            [self getOpdatedList];
+        }
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -727,10 +855,17 @@
       [self.btnOnGoing setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
      [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarColor alpha:1.0]];
     selectedTab=NO;
+    
+    if ([self.lblselectedTable.text isEqualToString:@"Order For Home develiry"]) {
+        [self removeAllSaveData];
+    }
+    
     [self getOpdatedList];
+    
     
 }
     -(IBAction)onClickPreviousOrder:(id)sender{
+        self.selectedOrder=@"";
     selectedTab=YES;
     [self.btnPrevious setButtonBackgroundColor: [JKSColor colorwithHexString:self.appUserObject.sidebarActiveColor alpha:1.0]];
   
@@ -752,13 +887,27 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@home_delivery_completed",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@home_delivery_completed",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@home_delivery_completed",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@home_delivery_completed",SERVERURLPATH]];
     //{"status":"1","order_no": "Al Ja-11-1"}
+    NSString *coupn=[NSString stringWithFormat:@"%.2f",coupon];
+    NSString *initialv=[NSString stringWithFormat:@"%.2f",initialvalue];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  orderNumber, @"order_no",
                                  @"1", @"status",
+                                 self.txtcoupon.text,@"coupon_code",
+                                 coupn,@"discount_amount",
+                                 initialv,@"coupon_discount",
                                  nil];
+//    jsonObject.addProperty("coupon_discount",discount);
+//    jsonObject.addProperty("discount_amount",discountPrice);
+
+    
     [class addJson:dict];
     [class setCallback:@selector(callBackServiceToGetCompleteHomeOrder:)];
     [class setController:self];
@@ -773,14 +922,25 @@
     if(response.isValid)
     {
         if ([rootDictionary objectForKey:@"msg"]) {
-             [self.navigationController popToRootViewControllerAnimated:YES];
+            
+            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+            // [self.navigationController popToRootViewControllerAnimated:YES];
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
+            
+            PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+            //nav.orderObj=self.orderObj;
+             nav.orderNumber=orderNumber;
+            [self.navigationController pushViewController:nav animated:YES];
+            
+            
         }
         
         
            }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
     
     
@@ -798,12 +958,22 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@order_completed",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_completed",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_completed",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@order_completed",SERVERURLPATH]];
     //{"status":"1","order_no": "Al Ja-11-1"}
+    NSString *coupn=[NSString stringWithFormat:@"%.2f",coupon];
+     NSString *initialv=[NSString stringWithFormat:@"%.2f",initialvalue];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  orderNumber, @"order_no",
                                  @"1", @"status",
+                                self.txtcoupon.text,@"coupon_code",
+                                 coupn,@"discount_amount",
+                                 initialv,@"coupon_discount",
                                  nil];
     [class addJson:dict];
     [class setCallback:@selector(callBackServiceToGetCompleteOrder:)];
@@ -819,14 +989,26 @@
     if(response.isValid)
     {
         if ([rootDictionary objectForKey:@"msg"]) {
-            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
-            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
-             [self.navigationController popToRootViewControllerAnimated:YES];
+            
+//            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+//            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+//            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+            // [self.navigationController popToRootViewControllerAnimated:YES];
             [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
+            
+            PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+            
+            nav.orderNumber=orderNumber;
+            [self.navigationController pushViewController:nav animated:YES];
+//            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+//            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+//            [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+//             [self.navigationController popToRootViewControllerAnimated:YES];
+//            [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
     
 }
@@ -838,7 +1020,13 @@
     NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
     if (tableName.length) {
         tbleId=tableid;
+        if (self.arayjsonOrder.count) {
+            [ECSToast showToast:@"please submit ongoing order first." view:self.view];
+        }else{
+            
         [self startServiceToCompleteOrder];
+            
+        }
     }else{
         [self startServiceToCompleteHomeOrder];
     }
@@ -871,7 +1059,9 @@
     for (int i=0; i<ooldFoodid.count; i++) {
         NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
         [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
-         FoodObject *object=[self.orderArray objectAtIndex:i];
+        
+          for (int j=0; j< self.orderArray.count; j++) {
+         FoodObject *object=[self.orderArray objectAtIndex:j];
         for (NSDictionary * dictionary in object.associatedFood)
         {
             
@@ -883,7 +1073,7 @@
             
         }
         
-        
+          }
     }
     [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
     
@@ -898,18 +1088,96 @@
     
 }
 
--(void)openSideMenuButtonClicked:(UIButton *)sender{
+-(IBAction)onclickofApplyButton:(id)sender{
     
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
+    
+    [self startServiceToapplyCoupon];
+}
+
+-(void)startServiceToapplyCoupon
+{
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    
+    [self performSelectorInBackground:@selector(serviceToGetapplyCoupon) withObject:nil];
+    
     
 }
+
+-(void)serviceToGetapplyCoupon
+{
+    ECSServiceClass * class = [[ECSServiceClass alloc]init];
+    [class setServiceMethod:POST];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@apply_coupon",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@apply_coupon",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@apply_coupon",SERVERURLPATH]];
+    //{"status":"1","order_no": "Al Ja-11-1"}
+    NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
+                                 self.txtcoupon.text, @"coupon_code",
+                                 self.appUserObject.resturantId, @"restaurant_id",
+                                 nil];
+    [class addJson:dict];
+    [class setCallback:@selector(callBackServiceToGetapplyCoupon:)];
+    [class setController:self];
+    
+    [class runService];
+}
+
+-(void)callBackServiceToGetapplyCoupon:(ECSResponse *)response
+{
+    [MBProgressHUD hideAllHUDsForView:self.view animated:YES];
+    NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
+    if(response.isValid)
+    {
+      
+        
+        NSNumber * isSuccessNumber = (NSNumber *)[rootDictionary objectForKey: @"status"];
+        if([isSuccessNumber boolValue] == YES)
+        {
+            //Price+allPreviousPriceWithTaxes
+         NSString   *lvalue=[rootDictionary objectForKey:@"value"];
+            initialvalue=lvalue.floatValue;
+             coupon=(Price+allPreviousPriceWithTaxes)*initialvalue/100;
+            self.lblafterapplycoupon.text=[NSString stringWithFormat:@"%@ %@ Discount coupon applied successfully \nDiscount price is %@ %.2f ",[rootDictionary objectForKey:@"value"],@"%",self.appUserObject.resturantCurrency,coupon];
+            
+           
+            grandValue=Price+allPreviousPriceWithTaxes-coupon;
+            self.lblgrandTotal.text=[NSString stringWithFormat:@"Grand total : %@ %.2f",self.appUserObject.resturantCurrency,grandValue];
+            // this is the YES case
+        } else {
+            initialvalue=0;
+            coupon=(Price+allPreviousPriceWithTaxes)*initialvalue/100;
+            self.lblgrandTotal.text=@"";
+            self.lblafterapplycoupon.text=@"";
+            // we end up here in the NO case **OR** if isSuccessNumber is nil
+        }
+        
+        
+        if ([rootDictionary objectForKey:@"msg"]) {
+            [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
+        }
+    }
+    
+    else [ECSAlert showAlert:@"Server Issue."];
+    
+    
+}
+
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 /*
  #pragma mark - Navigation
  

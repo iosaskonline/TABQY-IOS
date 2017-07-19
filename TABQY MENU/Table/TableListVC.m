@@ -38,7 +38,16 @@
      [self.menuCollectionView  registerNib:[UINib nibWithNibName:@"TableItemCell" bundle:nil]forCellWithReuseIdentifier:@"Cell"];
     // Do any additional setup after loading the view from its nib.
     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Tables",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    
     UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
@@ -64,8 +73,13 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     
-    [class setServiceURL:[NSString stringWithFormat:@"%@table_assign_to_waiter",SERVERURLPATH]];
-   
+   // [class setServiceURL:[NSString stringWithFormat:@"%@table_assign_to_waiter",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@table_assign_to_waiter",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@table_assign_to_waiter",@"tabqy.com",SERVERURLPATH]];
+    }
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.user_id, @"user_id",
                                  nil];
@@ -75,6 +89,7 @@
     
     [class runService];
 }
+//Server Issue.
 
 -(void)callBackServiceToGetAllTable:(ECSResponse *)response
 {
@@ -95,7 +110,7 @@
          [self.menuCollectionView reloadData];
     }
    
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -153,6 +168,7 @@
         TableListObject * connectionObject = [self.arrayTable objectAtIndex:indexPath.row];
         [ECSUserDefault saveString:connectionObject.tableName ToUserDefaultForKey:@"tablename"];
         [ECSUserDefault saveString:connectionObject.tableId ToUserDefaultForKey:@"tableId"];
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
         [self.navigationController pushViewController:menuVC animated:YES];
     }
     
@@ -180,18 +196,18 @@
     
 }
 
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
-    
-}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];

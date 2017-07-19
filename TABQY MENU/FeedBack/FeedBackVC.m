@@ -25,8 +25,16 @@
     NSString *orderNum;
 }
 @property(weak,nonatomic)IBOutlet UIView *viewTop;
+@property(strong,nonatomic)IBOutlet UIView *viewSuccess;
+
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage;
 @property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage2;
+@property(weak,nonatomic)IBOutlet UIImageView *restorentBGImage3;
+@property(weak,nonatomic)IBOutlet UIImageView *imgTable;
+@property(weak,nonatomic)IBOutlet UILabel *lblSelectTable;
+@property(weak,nonatomic)IBOutlet UILabel *lblSelectorder;
+
+
 @property(strong,nonatomic)NSMutableArray *arrayQues;
 @property(strong,nonatomic)NSMutableArray *arraySelected;
 @property(strong,nonatomic)NSMutableArray *arraySelectedNo;
@@ -57,13 +65,29 @@
     self.araySelectedType2=[[NSMutableArray alloc]init];
     [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Feedback",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
     
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
     
     [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+     {
+         // [self.activityProfileImage stopAnimating];
+     }];
+    
+    [self.restorentBGImage3 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -73,17 +97,48 @@
     self.arraySelectedNo=[[NSMutableArray alloc]init];
     
     [self startServiceToGetFeedBackQ];
+    NSString *tableName=[ECSUserDefault getStringFromUserDefaultForKey:@"tablename"];
+    NSString *tableid=[ECSUserDefault getStringFromUserDefaultForKey:@"tableId"];
+    NSString *orderNumb=[ECSUserDefault getStringFromUserDefaultForKey:@"orderNum"];
     if (self.orderObj.tableId.length) {
         self.txtTableName.text=self.orderObj.tableName;
         self.txtOrderNum.text=self.orderObj.orderNum;
         tableId=self.orderObj.tableId;
         
         NSLog(@"table %@",self.txtTableName.text);
-    }else{
+         NSLog(@"self.txtOrderNum %@",self.txtOrderNum);
+    }else if(orderNumb.length){
+          self.txtOrderNum.text=orderNumb;
+        self.txtTableName.text=tableName;
+        tableId=tableid;
+    }else
+    {
     [self startServiceToGetAllTable];
     }
+    [self.tblFeedback setContentInset:UIEdgeInsetsMake(1, 0, 350, 0)];
+[_txtName setDelegate:self];
+    [_txtEmail setDelegate:self];
+  [_txtPhone setDelegate:self];
    // self.txtAnswer.delegate=self;
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveNavigateToRootVC:)
+                                                 name:@"NavigateToRootVC"
+                                               object:nil];
 }
+- (void) receiveNavigateToRootVC:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"NavigateToRootVC"])
+        NSLog (@"Successfully received the test notification!");
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
+
 
 
 -(void)clickToPlaceOrderList:(id)sender{
@@ -112,8 +167,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@feedback_question",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@feedback_question",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@feedback_question",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@feedback_question",SERVERURLPATH]];
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.resturantId, @"resturant_id",
@@ -143,10 +203,17 @@
         [self.tblFeedback reloadData];
    }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
-
+- (void)openSideMenuButtonClicked:(id)sender
+{
+    [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToRootVC" object:nil];
+    
+    
+    [self.navigationController popToRootViewControllerAnimated:YES];
+    
+}
 -(void)startServiceToSubmitFeedBack
 {
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
@@ -156,6 +223,7 @@
     
 }
 
+
 -(void)serviceToSubmitFeedBack
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
@@ -163,12 +231,19 @@
     /*
      //{"resturant_id": "4","user_id": "23","order_no": "Al Ja-11-1","table_id": "19","name": "jeffi","phone": "85858585858","email": "jeffi@safe.com","feedback_response": [{"resturant_id": "4","order_no": "Al Ja-11-1","question_id": "1","answer": "good","question_type": "1"}, {"resturant_id": "4","order_no": "Al Ja-11-1","question_id": "2","answer": "Yes","question_type": "2"}, {"resturant_id": "4","order_no": "Al Ja-11-1","question_id": "3","answer": "This is good restauant","question_type": "3"}]}
      */
-    [class setServiceURL:[NSString stringWithFormat:@"%@feedback_answer",SERVERURLPATH]];
+    
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@feedback_answer",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@feedback_answer",@"tabqy.com",SERVERURLPATH]];
+    }
+    //[class setServiceURL:[NSString stringWithFormat:@"%@feedback_answer",SERVERURLPATH]];
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.resturantId, @"resturant_id",
                                  self.appUserObject.user_id,@"user_id",
-                                 orderNum,@"order_no",
+                                 self.txtOrderNum.text,@"order_no",
                                  tableId,@"table_id",
                                 self.txtName.text,@"name",
                                 self.txtPhone.text,@"phone",
@@ -188,11 +263,18 @@
     NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
     if(response.isValid)
     {
-       
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Feedback Successfully"]) {
+              [self resignFirstResponder];
+            [self.view endEditing:YES];
+            self.viewSuccess.hidden=NO;
+            self.viewSuccess.frame=CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height);
+            [self.view addSubview:self.viewSuccess];
+        }else{
         [ECSAlert showAlert:[rootDictionary valueForKey:@"msg"]];
+        }
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -214,7 +296,14 @@
     /*
     {"user_id": "23","from_date": "2016-11-17","to_date": "2016-11-17"}
      */
-    [class setServiceURL:[NSString stringWithFormat:@"%@order_in_progess_list_by_table",SERVERURLPATH]];
+    
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_in_progess_list_by_table",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_in_progess_list_by_table",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@order_in_progess_list_by_table",SERVERURLPATH]];
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -258,7 +347,7 @@
       
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -334,33 +423,38 @@
          cell.viewtextEntryType.hidden=NO;
         NSArray *items = [[dict valueForKey:@"choices"] componentsSeparatedByString:@","];
         
-        UIScrollView *scroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 30, cell.viewtextEntryType.frame.size.width+1000, 40)];
+        UIScrollView *scroll = [[UIScrollView alloc] initWithFrame:CGRectMake(0, 30, self.tblFeedback.frame.size.width-30, 40)];
        
         scroll.showsHorizontalScrollIndicator = YES;
         UISegmentedControl *segmentedControl;
-        if (items.count>15) {
-            
-             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+3000, 40);
-             segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+2030, 30);
-            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
-        }else if (items.count>10){
-            
-             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+2000, 40);
-             segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+1030, 30);
-            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
-        }else if (items.count>5){
-            
-             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+1000, 40);
-             segmentedControl.frame = CGRectMake(0, 0, cell.viewtextEntryType.frame.size.width+530, 30);
-            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
-        }else if (items.count<5){
-            
-            scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+800, 40);
-             segmentedControl.frame = CGRectMake(0, 0, cell.viewtextEntryType.frame.size.width+830, 30);
-        }
+//                 if (items.count>15) {
+//            
+//             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+2500, 40);
+//             segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+2030, 35);
+//            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+//        }else if (items.count>10){
+//            
+//             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+2000, 40);
+//             segmentedControl.frame = CGRectMake(20, 0, cell.viewtextEntryType.frame.size.width+1030, 35);
+//            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+//        }else if (items.count>5){
+//            
+//             scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+1000, 40);
+//             segmentedControl.frame = CGRectMake(0, 0, cell.viewtextEntryType.frame.size.width+530, 35);
+//            [segmentedControl setContentPositionAdjustment:UIOffsetMake(0, 0) forSegmentType:UISegmentedControlSegmentAny barMetrics:UIBarMetricsDefault];
+//        }else if (items.count<5){
+//            
+//            scroll.contentSize = CGSizeMake(cell.viewtextEntryType.frame.size.width+10, 40);
+//             segmentedControl.frame = CGRectMake(0, 0, cell.viewtextEntryType.frame.size.width+830, 35);
+//        }
         segmentedControl = [[UISegmentedControl alloc] initWithItems:items];
+        for (int i=0; i<items.count; i++) {
+            scroll.contentSize = CGSizeMake(200 +i*200, 40);
+        segmentedControl.frame = CGRectMake(0, 0, 200 +i*200, 32);
+        }
        
-     
+        
+
         
         
         segmentedControl.backgroundColor=[UIColor whiteColor];
@@ -521,10 +615,22 @@
       NSLog(@" object.answer =%@", object.answer);
     [self.tblFeedback reloadData];
 }
-
+-(BOOL)validateEmail:(NSString *)emailStr
+{
+    NSString *emailRegex = @"[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,4}";
+    NSPredicate *emailTest = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", emailRegex];
+    return [emailTest evaluateWithObject:emailStr];
+}
 -(IBAction)SubmitFeedBack:(id)sender{
+    if (self.txtName.text.length==0) {
+         [ECSAlert showAlert:@"Please enter Name."];
+    }else if (self.txtPhone.text.length==0){
+         [ECSAlert showAlert:@"Please enter valid Phone no."];
+    }
     
-    
+
+   
+    else{
     self.arrayFeedBackResponse=[[NSMutableArray alloc]init];
 
      for (int i=0; i<self.arrayQues.count; i++) {
@@ -537,12 +643,11 @@
                  [self.arrayFeedBackResponse addObject:dictonary];
                 
      }
-
-    
-   
+    [self resignFirstResponder];
     NSLog(@"self.arrayFeedBackResponse %@",self.arrayFeedBackResponse);
    
     [self startServiceToSubmitFeedBack];
+    }
 }
 -(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
@@ -575,8 +680,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@waiter_progress_table",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@waiter_progress_table",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@waiter_progress_table",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@waiter_progress_table",SERVERURLPATH]];
     
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
@@ -601,29 +711,31 @@
     {
         self.arrayTable=[[NSMutableArray alloc]init];
         NSArray *arr=[rootDictionary valueForKey:@"waitertable"];
-        if (arr.count) {
-            
-            for (NSDictionary * dictionary in arr)
-            {
-                TableListObject  *object=[TableListObject instanceFromDictionary:dictionary];
-                
-                [self.arrayTable addObject:object];
-            }
-            [self.tblAllTable reloadData];
-            TableListObject * connectionObject = [self.arrayTable objectAtIndex:0];
-            tableId=connectionObject.tableId;
-            self.txtTableName.text=connectionObject.tableName;
-            [self startServiceToGetAllOrderNum];
+        if ([[rootDictionary objectForKey:@"waitertable"] isKindOfClass:[NSNull class]]) {
             
         }else{
-            
+            if (arr.count) {
+                
+                for (NSDictionary * dictionary in arr)
+                {
+                    TableListObject  *object=[TableListObject instanceFromDictionary:dictionary];
+                    
+                    [self.arrayTable addObject:object];
+                }
+                [self.tblAllTable reloadData];
+                TableListObject * connectionObject = [self.arrayTable objectAtIndex:0];
+                tableId=connectionObject.tableId;
+                self.txtTableName.text=connectionObject.tableName;
+                [self startServiceToGetAllOrderNum];
+                
+            }
         }
        
         
        
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -640,7 +752,9 @@
         return;
     }else{
         if (_arrayTable.count) {
-            
+            self.imgTable.hidden=NO;
+            self.lblSelectTable.hidden=NO;
+            self.lblSelectorder.hidden=YES;
             self.viewAllTable.hidden=NO;
             self.tblAllTable.hidden=NO;
             self.tblAllOrder.hidden=YES;
@@ -658,7 +772,9 @@
         self.viewAllTable.hidden=NO;
         self.tblAllTable.hidden=YES;
         self.tblAllOrder.hidden=NO;
-        
+        self.imgTable.hidden=YES;
+        self.lblSelectTable.hidden=YES;
+        self.lblSelectorder.hidden=NO;
         [self.view addSubview:self.viewAllTable];
     }else{
         [ECSToast showToast:@"Please select table first." view:self.view];
@@ -675,13 +791,18 @@
 {
     NSString *newString = [textField.text stringByReplacingCharactersInRange:range withString:string];
  //   [self updateTextLabelsWithText: newString];
-     QuestionObject  *object=[self.arrayQues objectAtIndex:3];
+    if (_arrayQues.count) {
+        QuestionObject  *object=[self.arrayQues objectAtIndex:3];
+         NSLog(@"Changed Str: %@",object.answer);
+    }
+    
 //    if (self.txtAnswer.editing) {
 //        object.answer=newString;
 //    }
 //
-    
-    NSLog(@"Changed Str: %@",object.answer);
+  //  [self.tblFeedback setContentInset:UIEdgeInsetsMake(0, 0, 300, 0)];
+  
+   
     
     return YES;
 }
@@ -690,24 +811,27 @@
     [self.view endEditing:YES];
     [super touchesBegan:touches withEvent:event];
     [self resignFirstResponder];
+    //[self.tblFeedback setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
+
 }
 
-- (BOOL)textFieldShouldReturn:(UITextField *)textField{
-    if (textField==self.txtName) {
-         [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
-        [self.txtPhone becomeFirstResponder];
-    }else if (textField==self.txtPhone){
-        [self.txtEmail becomeFirstResponder];
-    }else{
-        [self resignFirstResponder];
-    }
-    
-    return YES;
-}
+//- (BOOL)textFieldShouldReturn:(UITextField *)textField{
+//    //[self.tblFeedback setContentInset:UIEdgeInsetsMake(0, 0, 0, 0)];
+//    if (textField==self.txtName) {
+//        // [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
+//        [self.txtPhone becomeFirstResponder];
+//    }else if (textField==self.txtPhone){
+//        [self.txtEmail becomeFirstResponder];
+//    }else{
+//        [self.txtEmail resignFirstResponder];
+//    }
+//    
+//    return YES;
+//}
 - (BOOL)textFieldShouldEndEditing:(UITextField *)textField{
     // add your method here
     if (textField==self.txtName) {
-        [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
+       // [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
         [self.txtName becomeFirstResponder];
     }else if (textField==self.txtPhone){
         [self.txtEmail becomeFirstResponder];
@@ -719,29 +843,46 @@
         
     }
 }
-//    -(void)textFieldShouldBeginEditing:(UITextField *)textField {
-//        if (textField==self.txtName) {
-//            [self.tblFeedback setContentOffset:CGPointMake(0,200) animated:YES];
-//            [self.txtName becomeFirstResponder];
-//        }else if (textField==self.txtPhone){
-//            [self.txtEmail becomeFirstResponder];
-//        }else if (textField==self.txtEmail){
-//            [self becomeFirstResponder];
-//        }
-//    }
+    -(BOOL)textFieldShouldBeginEditing:(UITextField *)textField {
 
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
+        if (textField==self.txtName) {
+            //[self.txtName becomeFirstResponder];
+        }else if (textField==self.txtPhone){
+           // [self.txtEmail becomeFirstResponder];
+        }else if (textField==self.txtEmail){
+           // [self becomeFirstResponder];
+        }
+        //[self.tblFeedback setContentOffset:CGPointMake(0,350) animated:YES];
+
+        return YES;
     }
-    
+-(IBAction)onclickThanks:(id)sender{
+                [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+                [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+                [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    self.viewSuccess.hidden=YES;
+     [[NSNotificationCenter defaultCenter] postNotificationName:@"NavigateToRootVC" object:nil];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
+
+
+-(BOOL)textFieldShouldReturn:(UITextField *)textField
+{
+    [textField resignFirstResponder];
+    return YES;
+}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 /*
 #pragma mark - Navigation
 

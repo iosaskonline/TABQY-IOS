@@ -48,16 +48,43 @@
      self.arraySelectedIndex=[[NSMutableArray alloc]init];
      [self.segmentedCollectionView  registerNib:[UINib nibWithNibName:@"SegmentedCell" bundle:nil]forCellWithReuseIdentifier:@"Cell"];
        [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Order Progress",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
    
    
     [self startServiceToGetOrdertable];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveNavigateToRootVC:)
+                                                 name:@"NavigateToRootVC"
+                                               object:nil];
 }
 
+- (void) receiveNavigateToRootVC:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"NavigateToRootVC"])
+        NSLog (@"Successfully received the test notification!");
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+    [self.navigationController popToRootViewControllerAnimated:YES];
+}
 
 
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -217,7 +244,14 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     //{"user_id": "23","from_date": "2016-11-17","to_date": "2016-11-17"}
-    [class setServiceURL:[NSString stringWithFormat:@"%@order_in_progess_list_home_delivery",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_in_progess_list_home_delivery",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_in_progess_list_home_delivery",@"tabqy.com",SERVERURLPATH]];
+    }
+    
+   // [class setServiceURL:[NSString stringWithFormat:@"%@order_in_progess_list_home_delivery",SERVERURLPATH]];
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -241,7 +275,9 @@
     NSDictionary *rootDictionary = [NSJSONSerialization JSONObjectWithData:response.data options:0 error:nil];
     if(response.isValid)
     {
-        
+        if ([[rootDictionary  valueForKey:@"msg"] isEqualToString:@"No orderd Found"]) {
+            [ECSToast showToast:@"No Order in progress." view:self.view];
+        }
         self.arrayOrderProgress=[[NSMutableArray alloc]init];
         self.dictFood=[rootDictionary valueForKey:@"food_orders_name"];
         NSArray *arr=[rootDictionary valueForKey:@"order_progess"];
@@ -257,12 +293,7 @@
         NSLog(@"arrayCompletedOrder=%@",self.arrayCompletedOrder);
         NSLog(@"arrayOrderProgress=%@",self.arrayOrderProgress);
         [self.tblProgress reloadData];
-    }
-    if ([[rootDictionary  valueForKey:@"msg"] isEqualToString:@"No orderd Found"]) {
-        [ECSToast showToast:@"No Order in progress." view:self.view];
-    }
-    
-    else [ECSAlert showAlert:@"Error!"];
+    }else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -324,7 +355,13 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     //{"user_id": "23","from_date": "2016-11-17","to_date": "2016-11-17"}
-    [class setServiceURL:[NSString stringWithFormat:@"%@order_in_progess_list_by_table",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_in_progess_list_by_table",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_in_progess_list_by_table",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@order_in_progess_list_by_table",SERVERURLPATH]];
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -371,7 +408,7 @@
         [self.tblProgress reloadData];
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -389,7 +426,13 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     //{"user_id": "23","from_date": "2016-11-17","to_date": "2016-11-17"}
-    [class setServiceURL:[NSString stringWithFormat:@"%@waiter_progress_table",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@waiter_progress_table",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@waiter_progress_table",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@waiter_progress_table",SERVERURLPATH]];
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -437,9 +480,9 @@
         
         
             TableListObject *homeDelivery=[[TableListObject alloc]init];
-            homeDelivery.tableName=@"home Delivery";
+            homeDelivery.tableName=@"Home Delivery";
             homeDelivery.tableId=nil;
-            homeDelivery.restaurentId=@"home Delivery";
+            homeDelivery.restaurentId=@"Home Delivery";
             [self.arraySelectedTable addObject:homeDelivery];
             if (self.arraySelectedTable.count>1) {
                 TableListObject * connectionObject = [self.arraySelectedTable objectAtIndex:0];
@@ -456,7 +499,7 @@
         [self.segmentedCollectionView reloadData];
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 -(void)clickToPlaceOrderList:(id)sender{
@@ -497,18 +540,18 @@
 
 
 
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
-    
-}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 
 
 @end

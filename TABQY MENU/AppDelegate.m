@@ -11,6 +11,12 @@
 #import "MVYSideMenuController.h"
 #import "DS_SideMenuVC.h"
 #import "ASK_HomeVC.h"
+#import "ECSBaseViewController.h"
+#import "ECSHelper.h"
+#import "UIExtensions.h"
+#import "ECSServiceClass.h"
+#import "AppUserObject.h"
+#import "LoginVC.h"
 @interface AppDelegate ()
 @property (nonatomic, retain) UIViewController * baseController;
 @property (nonatomic, retain) UIViewController * splashScreenViewController;
@@ -28,7 +34,18 @@
     
     self.launchUrl = [launchOptions objectForKey:UIApplicationLaunchOptionsURLKey];
     
-    UIViewController *contentVC=[[ASK_HomeVC alloc]initWithNibName:@"ASK_HomeVC" bundle:nil];
+  
+    UIViewController *contentVC;
+    
+    NSString *savedValue = [[NSUserDefaults standardUserDefaults]
+                            stringForKey:@"useridsaved"];
+    //if (savedValue.length) {
+       contentVC=[[ASK_HomeVC alloc]initWithNibName:@"ASK_HomeVC" bundle:nil];
+//    }else{
+//        contentVC=[[LoginVC alloc]initWithNibName:@"LoginVC" bundle:nil];
+//
+//    }
+    
     
     UIViewController *menuVC=[[DS_SideMenuVC alloc]initWithNibName:@"DS_SideMenuVC" bundle:nil];
     UINavigationController *contentNavigationController = [[UINavigationController alloc] initWithRootViewController:contentVC];
@@ -74,7 +91,10 @@
     
        
    
-    
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"selectedPrinterForKitchen"];
+
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"selectedPrinterForCashier"];
+
     return YES;
 }
 

@@ -77,18 +77,29 @@
     self.arraySelectedfoodIdsSave=[[NSMutableArray alloc]init];
     self.arrayAssociated=[[NSMutableArray alloc]init];
     self.arraySelectedAssociatedItem=[[NSMutableArray alloc]init];
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
 
      [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ OrderList",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
      [self.lblHeader setText:[NSString stringWithFormat:@"%@ Order List",self.appUserObject.resturantName]];
     self.lblMenuname.text=self.menuName;
     [self.segmentedCollectionView  registerNib:[UINib nibWithNibName:@"SegmentedCell" bundle:nil]forCellWithReuseIdentifier:@"Cell"];
+    
     if (self.appUserObject.resturantMenuImage ==(id)[NSNull null] ||[self.appUserObject.resturantMenuImage isEqualToString:@""]) {
         NSLog(@"ttt %@",self.appUserObject.resturantMenuImage);
       
         
     }else{
        
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",CousineImage,self.appUserObject.resturantMenuImage];
+      //  NSString *imgurl=[NSString stringWithFormat:@"%@%@",CousineImage,self.appUserObject.resturantMenuImage];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,CousineImage,self.appUserObject.resturantMenuImage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",CousineImage,self.appUserObject.resturantMenuImage];
+        }
+        
         [self.menuImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
              // [self.activityProfileImage stopAnimating];
@@ -99,7 +110,16 @@
     if (self.appUserObject.resturantLogo ==(id)[NSNull null] ||[self.appUserObject.resturantLogo isEqualToString:@""]) {
         NSLog(@"ttt %@",self.appUserObject.resturantLogo);
             }else{
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
+       // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
+                
+                NSString *imgurl;
+                NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+                
+                if (selectedIp.length) {
+                    imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORANTLOGO,self.appUserObject.resturantLogo];
+                }else{
+                    imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORANTLOGO,self.appUserObject.resturantLogo];
+                }
         [self.headerImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
              // [self.activityProfileImage stopAnimating];
@@ -108,12 +128,20 @@
         
     }
     
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
-    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -272,12 +300,17 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@cusinie",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@cusinie",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@cusinie",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@cusinie",SERVERURLPATH]];
     
     NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                          self.appUserObject.resturantId, @"resturant_id",
-                         
+                         self.menuId,@"menue_id",
                           nil];
     
     [class addJson:dict];
@@ -307,14 +340,18 @@
         
          [self.arraySelectedCosine addObject:@"0"];
        [self.tblCousine reloadData];
-        CousineObject * object = [arrayCusine objectAtIndex:0];
-        self.cusineId=object.cusineId;
-        [self startServiceToGetFoodtype];
+        if (arrayCusine.count) {
+            CousineObject * object = [arrayCusine objectAtIndex:0];
+            self.cusineId=object.cusineId;
+            [self startServiceToGetFoodtype];
+        }
+        
         
        // [self startServiceToGetFoodtype];
-        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Successfully LoggedIn"]) {
+        if ([[rootDictionary objectForKey:@"msg"] isEqualToString:@"Cusinie not found!"]) {
                     
-           
+            [ECSToast showToast:[rootDictionary objectForKey:@"msg"] view:self.view];
+
             
           //  [self.navigationController popViewControllerAnimated:YES];
             
@@ -323,7 +360,7 @@
           //  [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -340,12 +377,18 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@foodtype",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@foodtype",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@foodtype",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@foodtype",SERVERURLPATH]];
     
     NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                           self.appUserObject.resturantId, @"resturant_id",
                           self.cusineId,@"cusinie_id",
+                          self.menuId,@"menue_id",
                           nil];
     
     [class addJson:dict];
@@ -380,24 +423,27 @@
             
             self.segmentedCollectionView.hidden=YES;
             self.tblFood.hidden=YES;
-          [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
-            
+         // [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
+            [ECSToast showToast:[rootDictionary objectForKey:@"msg"] view:self.view];
+ 
             
         }else{
              self.segmentedCollectionView.hidden=NO;
              self.tblFood.hidden=NO;
+            if (arrayfoodType.count) {
+                FoodTypeObject * connectionObject = [arrayfoodType objectAtIndex:0];
+                foodTypeId=connectionObject.foodId;
+                [self startServiceToGetFood];
+                self.arraySelectedfoodType=[[NSMutableArray alloc]init];
+                [self.arraySelectedfoodType addObject:@"0"];
+                
+            }
            
-            FoodTypeObject * connectionObject = [arrayfoodType objectAtIndex:0];
-            foodTypeId=connectionObject.foodId;
-            [self startServiceToGetFood];
-            self.arraySelectedfoodType=[[NSMutableArray alloc]init];
-             [self.arraySelectedfoodType addObject:@"0"];
-            
           //
             //  [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -414,8 +460,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@food",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@food",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@food",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@food",SERVERURLPATH]];
    
     NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                           self.appUserObject.resturantId, @"resturant_id",
@@ -461,7 +512,7 @@
             //  [ECSAlert showAlert:[rootDictionary objectForKey:@"msg"]];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -510,6 +561,8 @@
         if (data.length) {
             FoodObject *obj=[NSKeyedUnarchiver unarchiveObjectWithData:data];
             if ([obj.foodId isEqualToString:object.foodId]) {
+                [self.arraySelectedfoodSave addObject:object];
+
                 object=obj;
             }
         }
@@ -517,8 +570,15 @@
         cell.lblFoodName.text=object.foodName;
         
         NSString *strimage = object.foodImage;
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.foodImage];
+       // NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.foodImage];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
         
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,FOODIMAGE,object.foodImage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",FOODIMAGE,object.foodImage];
+        }
         if ([strimage isKindOfClass:[NSNull class]]) {
             cell.imgFood.image = [UIImage imageNamed:@"Pasted image.png"];
             
@@ -531,6 +591,7 @@
             [cell.imgFood ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
                 
             }];
+            cell.imgFood .contentMode = UIViewContentModeScaleAspectFit;
             
         }
         cell.lblFoodprice.text=[NSString stringWithFormat:@"%@ %@",self.appUserObject.resturantCurrency,object.price];
@@ -604,7 +665,15 @@
         cell.lblName.text=object.associatedFoodName;
         
         NSString *strimage = object.associatedFoodimage;
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.associatedFoodimage];
+       // NSString *imgurl=[NSString stringWithFormat:@"%@%@",FOODIMAGE,object.associatedFoodimage];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,FOODIMAGE,object.associatedFoodimage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",FOODIMAGE,object.associatedFoodimage];
+        }
         
         if ([strimage isKindOfClass:[NSNull class]]) {
             cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
@@ -618,7 +687,7 @@
             [cell.img_view ecs_setImageWithURL:[NSURL URLWithString:[imgurl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] placeholderImage:[UIImage imageNamed:@"User-image.png"] options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL) {
                  [cell.activityInd stopAnimating];
             }];
-            
+            cell.img_view.contentMode = UIViewContentModeScaleAspectFit;
         }
         cell.lblPrice.text=[NSString stringWithFormat:@"%@ %@",self.appUserObject.resturantCurrency,object.associatedFoodPrice];
         
@@ -686,6 +755,16 @@
         [_arraySelected addObject:strContact];
         FoodObject *object=[self.arrayFood objectAtIndex:btn.tag];
         foodIdSelected=object.foodId;
+    NSString *key=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
+    NSData *data=[ECSUserDefault getObjectFromUserDefaultForKey:key];
+    if (data.length) {
+        FoodObject *obj=[NSKeyedUnarchiver unarchiveObjectWithData:data];
+        if ([obj.foodId isEqualToString:object.foodId]) {
+            object.foodCount=obj.foodCount;
+        }
+    }
+
+    
         NSInteger a=[object.foodCount intValue];
          NSInteger b=[strFromInt intValue];
         NSInteger c=a+b;
@@ -704,6 +783,8 @@
         if (c>1) {
             self.viewAssociatedItem.hidden=YES;
         }else{
+            self.arraySelectedAssociatedItem=[[NSMutableArray alloc]init];
+            [self.tblAssociatedItems reloadData];
              self.viewAssociatedItem.hidden=NO;
              [self.view addSubview:self.viewAssociatedItem];
         }
@@ -715,10 +796,10 @@
    
         [self.arraySelectedfoodSave addObject:object];
         [self.arraySelectedfoodIdsSave addObject:object.foodId];
-        NSData * data = [NSKeyedArchiver archivedDataWithRootObject:object];
+        NSData * data1 = [NSKeyedArchiver archivedDataWithRootObject:object];
         
         NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
-        [[NSUserDefaults standardUserDefaults]setObject:data forKey:strForKey];
+        [[NSUserDefaults standardUserDefaults]setObject:data1 forKey:strForKey];
         [[NSUserDefaults standardUserDefaults]synchronize];
   
     NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
@@ -726,10 +807,7 @@
 
     [self saveFoodIdwithOldfoodIdList:uniquearray];
     
-//        [[NSUserDefaults standardUserDefaults]setObject:self.arraySelectedfoodIdsSave  forKey:@"oldFoodId"];
-//        [[NSUserDefaults standardUserDefaults]synchronize];
-    
-   
+
     
     [self.tblFood reloadData];
     [self.tblAssociatedItems reloadData];
@@ -740,7 +818,7 @@
     NSString *strContact=  [NSString stringWithFormat:@"%li",btn.tag];
     BOOL flag=   [self.arraySelectedAssociatedItem containsObject:strContact];
     
-  //  NSString *strFromInt = [NSString stringWithFormat:@"%d",1];
+  
      AssociatedFoodObject *object=[self.arrayAssociated objectAtIndex:btn.tag];
         if(flag == NO )
         {
@@ -784,6 +862,20 @@
         
         if (object.foodCount==0) {
             object.foodCount=@"1";
+            NSData * data = [NSKeyedArchiver archivedDataWithRootObject:object];
+            [self.arraySelectedfoodSave addObject:object];
+            [self.arraySelectedfoodIdsSave addObject:object.foodId];
+            NSString *strForKey=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
+            [[NSUserDefaults standardUserDefaults]setObject:data forKey:strForKey];
+            [[NSUserDefaults standardUserDefaults]synchronize];
+            
+            // }
+            
+                    NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
+                    [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
+            
+            [[NSUserDefaults standardUserDefaults]setObject:self.arraySelectedfoodIdsSave  forKey:@"oldFoodId"];
+            [[NSUserDefaults standardUserDefaults]synchronize];
             //[ECSToast showToast:@"Please add number of item First" view:self.view];
         }else{
             [self.arraySelectedfoodSave addObject:object];
@@ -796,8 +888,8 @@
             
        // }
         
-//        NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
-//        [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
+        NSMutableArray *oldFoodIdArr=[[NSUserDefaults standardUserDefaults]objectForKey:@"oldFoodId"];
+        [self saveFoodIdwithOldfoodIdList:oldFoodIdArr];
      
         [[NSUserDefaults standardUserDefaults]setObject:self.arraySelectedfoodIdsSave  forKey:@"oldFoodId"];
         [[NSUserDefaults standardUserDefaults]synchronize];
@@ -852,6 +944,14 @@
       NSString *strFromInt = [NSString stringWithFormat:@"%d",1];
         FoodObject *object=[self.arrayFood objectAtIndex:btn.tag];
     
+    NSString *key=[NSString stringWithFormat:@"placeOrder%ld",(long)[object.foodId integerValue]];
+    NSData *data=[ECSUserDefault getObjectFromUserDefaultForKey:key];
+    if (data.length) {
+        FoodObject *obj=[NSKeyedUnarchiver unarchiveObjectWithData:data];
+        if ([obj.foodId isEqualToString:object.foodId]) {
+            object.foodCount=obj.foodCount;
+        }
+    }
         NSInteger a=[object.foodCount intValue];
         NSInteger b=[strFromInt intValue];
         NSInteger c=a-b;
@@ -993,6 +1093,19 @@
 }
 
 -(IBAction)onClickCancel:(id)sender{
+    
+   
+    for (int i=0; i<self.arraySelectedAssociatedItem.count; i++) {
+         AssociatedFoodObject *object=[self.arrayAssociated objectAtIndex:i];
+        NSString *strForKey=[NSString stringWithFormat:@"placeOrderWithAssociatedFood%ld%ld",(long)[foodIdSelected integerValue],(long)[object.associatedFoodId integerValue]];
+        [[NSUserDefaults standardUserDefaults]setObject:@"" forKey:strForKey];
+       // [self.arraySelectedAssociatedItem removeObject:strContact];
+    }
+
+    
+    [self.tblAssociatedItems reloadData];
+    
+    self.arraySelectedAssociatedItem=[[NSMutableArray alloc]init];
        self.viewAssociatedItem.hidden=YES;
 }
 
@@ -1000,18 +1113,18 @@
     self.viewAssociatedItem.hidden=YES;
 }
 
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
-    
-}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 -(IBAction)onClickBack:(id)sender{
     [self.navigationController popViewControllerAnimated:YES];
 }

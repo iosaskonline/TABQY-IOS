@@ -16,6 +16,7 @@
 #import "MBProgressHUD.h"
 #import "MenuCousineVC.h"
 #import "PlaceOrderVC.h"
+#import "CompleteOrderVC.h"
 #import "SearchFoodVC.h"
 #import "MVYSideMenuController.h"
 @interface MenuItemVC (){
@@ -42,14 +43,24 @@
     
     [self.menuCollectionView  registerNib:[UINib nibWithNibName:@"MenuItemCell" bundle:nil]forCellWithReuseIdentifier:@"Cell"];
      NSLog(@"ttt %@",self.appUserObject.resturantMenuImage);
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+
     if (self.appUserObject.resturantMenuImage ==(id)[NSNull null] ||[self.appUserObject.resturantMenuImage isEqualToString:@""]) {
         NSLog(@"ttt %@",self.appUserObject.resturantMenuImage);
         // [self.btnEdit setButtonTitle:@"Upload"];
         
     }else{
         [self.activityInd startAnimating];
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantMenuImage];
-        [self.menuImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+       // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantMenuImage];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantMenuImage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantMenuImage];
+        }
+        [self.menuImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
             [self.activityInd stopAnimating];
          }];
@@ -64,8 +75,16 @@
         
     }else{
        // [self.activityInd startAnimating];
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
-        [self.headerImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+      //  NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORANTLOGO,self.appUserObject.resturantLogo];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORANTLOGO,self.appUserObject.resturantLogo];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORANTLOGO,self.appUserObject.resturantLogo];
+        }
+        [self.headerImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
               //[self.activityInd stopAnimating];
          }];
@@ -73,13 +92,39 @@
         
     }
    // [self.activityInd startAnimating];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          //[self.activityInd stopAnimating];
      }];
     [self callMenu];
     // Do any additional setup after loading the view from its nib.
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveNavigateToRootVC:)
+                                                 name:@"NavigateToRootVC"
+                                               object:nil];
+}
+
+- (void) receiveNavigateToRootVC:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"NavigateToRootVC"])
+        NSLog (@"Successfully received the test notification!");
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 
@@ -97,8 +142,14 @@
 
 {
         [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-    
-    NSString *url=[NSString stringWithFormat:@"%@menu",SERVERURLPATH];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    NSString *url;
+    if (selectedIp.length) {
+         url=[NSString stringWithFormat:@"http://%@%@menu",selectedIp,SERVERURLPATH];
+    }else{
+        url=[NSString stringWithFormat:@"http://%@%@menu",@"tabqy.com",SERVERURLPATH];
+    }
+   
 //    NSString *emailfeild=@"harish";
 //    NSString *passwordfeild=@"123456";
     
@@ -233,14 +284,23 @@
     
     MenuLink * connectionObject = [arrMenuItem objectAtIndex:indexPath.row];
     NSString *strimage = connectionObject.image;
-      NSString *imgurl=[NSString stringWithFormat:@"%@%@",MENUIMAGEURLPATH,connectionObject.image];
+    
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    NSString *imgurl;
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,MENUIMAGEURLPATH,connectionObject.image];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",MENUIMAGEURLPATH,connectionObject.image];
+    }
+     // NSString *imgurl=[NSString stringWithFormat:@"%@%@",MENUIMAGEURLPATH,connectionObject.image];
     
     if ([strimage isKindOfClass:[NSNull class]]) {
         cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
         
     }
     else if([strimage isEqualToString:@""] ){
-        cell.img_view.image = [UIImage imageNamed:@"Pasted image.png"];
+        cell.img_view.image = [UIImage imageNamed:@"icon_order_online.png"];
+        [cell.activityInd stopAnimating];
     }
     else{
          [cell.activityInd startAnimating];
@@ -312,21 +372,35 @@
 }
 
 -(void)clickToPlaceOrderList:(id)sender{
-    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
-    [self.navigationController pushViewController:nav animated:YES];
-    
-    NSLog(@"placeOrderClicked");
-}
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    
-    if (sideMenuController) {
+    UIViewController *nav=nil;
+    NSString *orderNum=[ECSUserDefault getStringFromUserDefaultForKey:@"orderNum"];
+    if (orderNum.length>1) {
+        CompleteOrderVC *new=[[CompleteOrderVC alloc]init];
+        nav = new;
         
-        [sideMenuController openMenu];
+        new.selectedOrder=orderNum;
+        
+    }else{
+        nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
     }
     
+    
+    
+    [self.navigationController pushViewController:nav animated:YES];
+    
+    
+
 }
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 
 
 /*

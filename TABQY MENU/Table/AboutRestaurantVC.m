@@ -44,8 +44,17 @@
     NSString *scrName=[NSString stringWithFormat:@"About %@",self.appUserObject.resturantName];
     [self settingTopView:self.viewTop onController:self andTitle:scrName andImg:@"arrow-left.png"];
     
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -79,8 +88,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@about_restaurant",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@about_restaurant",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@about_restaurant",@"tabqy.com",SERVERURLPATH]];
+    }
+    //[class setServiceURL:[NSString stringWithFormat:@"%@about_restaurant",SERVERURLPATH]];
     //{"resturant_id":"8","food_name":"sa"}
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.resturantId, @"resturant_id",
@@ -104,7 +118,16 @@
         NSDictionary *dict=[arr objectAtIndex:0];
         self.txtDiscription.text=[dict valueForKey:@"description"];
         
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTAURANTIMG,[dict valueForKey:@"restaurant_image"]];
+       // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTAURANTIMG,[dict valueForKey:@"restaurant_image"]];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTAURANTIMG,[dict valueForKey:@"restaurant_image"]];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTAURANTIMG,[dict valueForKey:@"restaurant_image"]];
+        }
+        
         [self.imgRestorent ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
              // [self.activityProfileImage stopAnimating];
@@ -112,8 +135,8 @@
 
         [self.segmentedCollectionView reloadData];
     }
-    
-    else [ECSAlert showAlert:@"Error!"];
+   
+    else  [ECSAlert showAlert:@"Server Issue."];
     
 }
 -(NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section {
@@ -141,7 +164,16 @@
     //FoodRelatedItemObject * connectionObject = [self.arrayRelatedItems objectAtIndex:indexPath.row];
     
     [cell.lblName setText:[dict valueForKey:@"username"]];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",TEAMIMG,[dict valueForKey:@"profile_image"]];
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",TEAMIMG,[dict valueForKey:@"profile_image"]];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,TEAMIMG,[dict valueForKey:@"profile_image"]];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",TEAMIMG,[dict valueForKey:@"profile_image"]];
+    }
+
     [cell.img_view ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
@@ -172,17 +204,17 @@
     
     
 }
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
-    
-}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 
 @end

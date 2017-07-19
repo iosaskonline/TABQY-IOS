@@ -274,6 +274,7 @@
     selectedIndex =[[NSMutableArray alloc]init];
        UIViewController * contentScreen = nil;
     NSString *strContact=[NSString stringWithFormat:@"%li",indexPath.row];
+    
  
     BOOL flag=   [selectedIndex containsObject:strContact];
    
@@ -291,13 +292,20 @@
 
   
     if (indexPath.row==0) {
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+        [self removeAllSaveData];
         contentScreen = (TableListVC *) [[TableListVC alloc]initWithNibName:@"TableListVC" bundle:nil];
        
     }else if (indexPath.row==1){
        
         [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
         [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
-         contentScreen = (ASK_HomeVC *) [[ASK_HomeVC alloc]initWithNibName:@"ASK_HomeVC" bundle:nil];
+       
+        [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+         [self.sideMenuController closeMenu];
+         //contentScreen = (ASK_HomeVC *) [[ASK_HomeVC alloc]initWithNibName:@"ASK_HomeVC" bundle:nil];
 //        UIViewController *menuVC=[[DS_SideMenuVC alloc]initWithNibName:@"DS_SideMenuVC" bundle:nil];
 //        MVYSideMenuOptions *options = [[MVYSideMenuOptions alloc] init];
 //        options.contentViewScale = 1.0;
@@ -331,23 +339,24 @@
     else{
         [AppUserObject removeFromUserDefault];
         [self removeAllSaveData];
+        
     selectedIndex =[[NSMutableArray alloc]init];
         contentScreen = (LoginVC *) [[LoginVC alloc]initWithNibName:@"LoginVC" bundle:nil];
        
     }
     
     if(contentScreen){
-        
-        UIViewController *menuVC=[[DS_SideMenuVC alloc]initWithNibName:@"DS_SideMenuVC" bundle:nil];
-        MVYSideMenuOptions *options = [[MVYSideMenuOptions alloc] init];
-        options.contentViewScale = 1.0;
-        options.contentViewOpacity = 0.05;
-        options.shadowOpacity = 0.0;
-        
-        MVYSideMenuController *sideMenuController = [[MVYSideMenuController alloc] initWithMenuViewController:menuVC contentViewController:contentScreen options:options];
-        sideMenuController.menuFrame = CGRectMake(0, 0, 320.0, self.view.bounds.size.height);
-        [self.navigationController pushViewController:sideMenuController animated:NO];
-       // [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
+//        
+//        UIViewController *menuVC=[[DS_SideMenuVC alloc]initWithNibName:@"DS_SideMenuVC" bundle:nil];
+//        MVYSideMenuOptions *options = [[MVYSideMenuOptions alloc] init];
+//        options.contentViewScale = 1.0;
+//        options.contentViewOpacity = 0.05;
+//        options.shadowOpacity = 0.0;
+//        
+//        MVYSideMenuController *sideMenuController = [[MVYSideMenuController alloc] initWithMenuViewController:menuVC contentViewController:contentScreen options:options];
+//        sideMenuController.menuFrame = CGRectMake(0, 0, 320.0, self.view.bounds.size.height);
+//        [self.navigationController pushViewController:sideMenuController animated:NO];
+        [self.sideMenuController.navigationController pushViewController:contentScreen animated:NO];
         
     }
   [self.sideMenuController closeMenu];
@@ -355,6 +364,7 @@
 }
 -(void)removeAllSaveData{
     
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
     [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
     [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
     

@@ -25,7 +25,7 @@
 #import "TodaySplVC.h"
 #import "PlaceOrderVC.h"
 #import "SearchFoodVC.h"
-
+#import "CompleteOrderVC.h"
 @interface ASK_HomeVC (){
     NSString *restaurentId;
    
@@ -59,11 +59,47 @@
   [self settingTopView:self.viewTop onController:self andTitle:scrName andImg:@"nav_header_icon.png"];
     //@"restorentgp.jpg"
     UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+   // NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    
     [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          
      }];
+    
+    NSString *endDate=[ECSUserDefault getStringFromUserDefaultForKey:@"subscription_end_date"];
+    NSLog(@"endDate %@",endDate);
+    
+    
+    
+    NSDateFormatter *dateFormatter = [[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd"];
+    NSDate *date = [dateFormatter dateFromString:endDate];
+    
+    
+    NSInteger t=[ECSDate daysBetweenDate:[NSDate date] andDate:date];
+    NSLog(@"jhfewijdf %ld",(long)t);
+    if (t>0) {
+        NSLog(@"already subscribed");
+    }else{
+        if (self.appUserObject.resturantId) {
+          
+        UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"Info"
+                                                            message:@"Subscription Expired!"
+                                                           delegate:self
+                                                  cancelButtonTitle:nil
+                                                  otherButtonTitles:@"Ok", nil];
+        [alertView show];
+//
+        }
+    }
 
 }
 - (void)updateAction:(NSNotification *) notification
@@ -78,7 +114,15 @@
         
         
     }else{
-        NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,userData.resturantBgImage];
+        //NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,userData.resturantBgImage];
+        NSString *imgurl;
+        NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+        
+        if (selectedIp.length) {
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,userData.resturantBgImage];
+        }else{
+            imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,userData.resturantBgImage];
+        }
         [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
          {
              // [self.activityProfileImage stopAnimating];
@@ -91,6 +135,17 @@
         [self startServiceToGetTaxType];
     }
     
+    
+   
+    
+}
+
+- (void)alertView:(UIAlertView *)alertView didDismissWithButtonIndex:(NSInteger)buttonIndex {
+    // the user clicked OK
+    if (buttonIndex == 0) {
+        LoginVC *login=[[LoginVC alloc]initWithNibName:@"LoginVC" bundle:nil];
+        [self.navigationController pushViewController:login animated:NO];
+    }
 }
 -(void)viewWillAppear:(BOOL)animated{
        [self.btnfeedback setBackgroundImage:[UIImage imageNamed:@""] forState:UIControlStateNormal];
@@ -178,13 +233,25 @@
 
 
 -(void)clickToPlaceOrderList:(id)sender{
-    PlaceOrderVC *nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
-    
 
+    UIViewController *nav=nil;
+    NSString *orderNum=[ECSUserDefault getStringFromUserDefaultForKey:@"orderNum"];
+    if (orderNum.length>1) {
+        CompleteOrderVC *new=[[CompleteOrderVC alloc]init];
+        nav = new;
+        
+        new.selectedOrder=orderNum;
+        
+    }else{
+        nav=[[PlaceOrderVC alloc]initWithNibName:@"PlaceOrderVC" bundle:nil];
+    }
+    
+    
     
     [self.navigationController pushViewController:nav animated:YES];
     
     
+
 }
 
 
@@ -201,8 +268,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@tax_management",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@tax_management",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@tax_management",@"tabqy.com",SERVERURLPATH]];
+    }
+   // [class setServiceURL:[NSString stringWithFormat:@"%@tax_management",SERVERURLPATH]];
     
     NSDictionary *dict = [[NSDictionary alloc] initWithObjectsAndKeys:
                           restaurentId, @"resturant_id",
@@ -239,7 +311,7 @@
         }
 
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -254,34 +326,6 @@
 }
 
 
--(void)createPDFfromUIView:(UIView*)aView saveToDocumentsWithFileName:(NSString*)aFilename
-{
-    // Creates a mutable data object for updating with binary data, like a byte array
-    NSMutableData *pdfData = [NSMutableData data];
-    
-    // Points the pdf converter to the mutable data object and to the UIView to be converted
-    UIGraphicsBeginPDFContextToData(pdfData, aView.bounds, nil);
-    UIGraphicsBeginPDFPage();
-    CGContextRef pdfContext = UIGraphicsGetCurrentContext();
-    
-    
-    // draws rect to the view and thus this is captured by UIGraphicsBeginPDFContextToData
-    
-    [aView.layer renderInContext:pdfContext];
-    
-    // remove PDF rendering context
-    UIGraphicsEndPDFContext();
-    
-    // Retrieves the document directories from the iOS device
-    NSArray* documentDirectories = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask,YES);
-    
-    NSString* documentDirectory = [documentDirectories objectAtIndex:0];
-    NSString* documentDirectoryFilename = [documentDirectory stringByAppendingPathComponent:aFilename];
-    
-    // instructs the mutable data object to write its context to a file on disk
-    [pdfData writeToFile:documentDirectoryFilename atomically:YES];
-    NSLog(@"documentDirectoryFileName: %@",documentDirectoryFilename);
-}
 /*
 #pragma mark - Navigation
 

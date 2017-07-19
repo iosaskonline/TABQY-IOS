@@ -21,6 +21,7 @@
 #import "SearchFoodVC.h"
 #import "MVYSideMenuController.h"
 #import "FeedBackVC.h"
+#import "PrintInvoiceVC.h"
 @interface OrderHistryVC ()
 {
     NSString *tbleId;
@@ -51,12 +52,22 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
      [self settingTopView:self.viewTop onController:self andTitle:[NSString stringWithFormat:@"%@ Order Histry",self.appUserObject.resturantName] andImg:@"arrow-left.png"];
-    NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
-    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+  //  NSString *imgurl=[NSString stringWithFormat:@"%@%@",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    NSString *imgurl;
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    
+    if (selectedIp.length) {
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",selectedIp,RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }else{
+        imgurl=[NSString stringWithFormat:@"http://%@%@%@",@"tabqy.com",RESTORENTBGIMAGE,self.appUserObject.resturantBgImage];
+    }
+    UIImage *img=[UIImage imageWithName:@"restorentgp.jpg"];
+
+    [self.restorentBGImage ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
-    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:nil options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
+    [self.restorentBGImage2 ecs_setImageWithURL:[NSURL URLWithString:imgurl] placeholderImage:img options:0 completed:^(UIImage *image, NSError *error, SDImageCacheType cacheType, NSURL *imageURL)
      {
          // [self.activityProfileImage stopAnimating];
      }];
@@ -79,6 +90,23 @@
     [self.toDate setInputView:self.pickerEndTime];
     [self startServiceToGetOrderHistory];
     [self startServiceToGetAllTable];
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(receiveNavigateToRootVC:)
+                                                 name:@"NavigateToRootVC"
+                                               object:nil];
+}
+- (void) receiveNavigateToRootVC:(NSNotification *) notification
+{
+    // [notification name] should always be @"TestNotification"
+    // unless you use this method for observation of other notifications
+    // as well.
+    
+    if ([[notification name] isEqualToString:@"NavigateToRootVC"])
+        NSLog (@"Successfully received the test notification!");
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"orderNum"];
+    [self.navigationController popToRootViewControllerAnimated:YES];
 }
 
 
@@ -97,7 +125,14 @@
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
     //{"from_date": "2016-11-17","to_date": "2016-11-17"} or{"table_id":"9"} or {"table_id": "9","from_date": "2016-11-17","to_date": "2016-11-17"} or {"type": "1","from_date": "2016-11-26","to_date": "2016-12-12"}
-    [class setServiceURL:[NSString stringWithFormat:@"%@order_history",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_history",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@order_history",@"tabqy.com",SERVERURLPATH]];
+    }
+    
+   // [class setServiceURL:[NSString stringWithFormat:@"%@order_history",SERVERURLPATH]];
     NSDate *now = [NSDate date];
     NSString *date=[ECSDate getFormattedDateString:now];
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
@@ -149,7 +184,7 @@
         [self.tblHistory reloadData];
         }
     }
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -218,31 +253,45 @@
     [self.tblHistory setSeparatorStyle:UITableViewCellSeparatorStyleNone];
     cell.backgroundColor = [UIColor clearColor];
     OrderHistryObject *object;
-        [cell.btnDetail addTarget:self action:@selector(clickToshowDetail:) forControlEvents:UIControlEventTouchUpInside];
+        
        // [cell.btnFeedback addTarget:self action:@selector(clickToFeedback:) forControlEvents:UIControlEventTouchUpInside];
 
+    [cell.btnPrint addTarget:self action:@selector(clickToshowDetail:) forControlEvents:UIControlEventTouchUpInside];
 
     if (indexPath.section==0) {
         // cell.btnFeedback.hidden=YES;
-         cell.btnDetail.hidden=NO;
+         //cell.btnDetail.hidden=NO;
          object=[self.arrayOrderProgress objectAtIndex:indexPath.row];
+        [cell.btnPrint setTitle:@"Details" forState:UIControlStateNormal];
     [cell.btnFeedback addTarget:self action:@selector(clickToFeedback:) forControlEvents:UIControlEventTouchUpInside];
+         cell.btnPrint.hidden=NO;
     }else{
          object=[self.arrayCompletedOrder objectAtIndex:indexPath.row];
           cell.btnFeedback.hidden=NO;
-        cell.btnDetail.hidden=YES;
+       // [cell.btnPrint addTarget:self action:@selector(clickToPrint:) forControlEvents:UIControlEventTouchUpInside];
+       [cell.btnPrint setTitle:@"Print" forState:UIControlStateNormal];
+        cell.btnPrint.hidden=NO;
+      //  cell.btnDetail.hidden=YES;
+
  [cell.btnFeedback addTarget:self action:@selector(clickToFeedbackFromComplete:) forControlEvents:UIControlEventTouchUpInside];
     }
    
+        cell.btnPrint.tag=indexPath.row;
     cell.lbldate.text=object.orderDate;
-    cell.lblvalue.text=[NSString stringWithFormat:@" %@ %@",self.appUserObject.resturantCurrency,object.orderValue];
+cell.lblvalue.text=[NSString stringWithFormat:@" %@ %.2f",self.appUserObject.resturantCurrency,object.orderValue.floatValue];
     cell.lblOrderTime.text=object.ordrTime;
+        
+       
+        
+        
     cell.lbltablename.text=object.tableName;
     if ([cell.lbltablename.text isEqualToString:@""]) {
         cell.lbltablename.text=@"Home Delivery";
+        cell.btnFeedback.hidden=YES;
+        
     }
     cell.lblwaitername.text=object.waiterName;
-        cell.btnDetail.tag=indexPath.row;
+        cell.btnPrint.tag=indexPath.row;
          cell.btnFeedback.tag=indexPath.row;
     return cell;
     }else{
@@ -264,14 +313,51 @@
     }
 
     }
+-(void)removeAllSaveData{
+    
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tablename"];
+    [ECSUserDefault saveString:@"" ToUserDefaultForKey:@"tableId"];
+    
+    NSMutableArray *oldFoodid = [[[NSUserDefaults standardUserDefaults] objectForKey:@"oldFoodId"] mutableCopy];
+    NSArray *ooldFoodid = [[NSSet setWithArray:oldFoodid] allObjects];
+    
+    for (int i=0; i<ooldFoodid.count; i++) {
+        NSString *key=[NSString stringWithFormat:@"placeOrder%@",[ooldFoodid objectAtIndex:i]];
+        [ECSUserDefault RemoveObjectFromUserDefaultForKey:key];
+    }
+    
+    [ECSUserDefault RemoveObjectFromUserDefaultForKey:@"oldFoodId"];
+    
+}
+//-(void)clickToPrintForKitchen:(id)sender{
+//    UIButton *btn=(UIButton *)sender;
+//    OrderHistryObject *object=[self.arrayOrderProgress objectAtIndex:btn.tag];
+//    PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+//    nav.selectedPrinter=@"kitchen";
+//    nav.orderObj=object;
+//    [self.navigationController pushViewController:nav animated:YES];
+//}
 
 -(void)clickToshowDetail:(id)sender{
     UIButton *btn=(UIButton *)sender;
-    OrderHistryObject *object=[self.arrayOrderProgress objectAtIndex:btn.tag];
+    
+    if ([btn.titleLabel.text isEqualToString:@"Print"]) {
+        NSLog(@"Print");
+        OrderHistryObject *object=[self.arrayCompletedOrder objectAtIndex:btn.tag];
+        PrintInvoiceVC *nav=[[PrintInvoiceVC alloc]initWithCoder:nil];
+        [ECSUserDefault saveString:object.tableId ToUserDefaultForKey:@"tableId"];
+        [ECSUserDefault saveString:object.tableName ToUserDefaultForKey:@"tablename"];
+        [ECSUserDefault saveString:object.orderNum ToUserDefaultForKey:@"orderNum"];
+        nav.orderObj=object;
+        [self.navigationController pushViewController:nav animated:YES];
+    }else{
+    [self removeAllSaveData];
+   OrderHistryObject *object=[self.arrayOrderProgress objectAtIndex:btn.tag];
     //NSString *ordernum=object.orderNum;
     CompleteOrderVC *nav=[[CompleteOrderVC alloc]initWithNibName:@"CompleteOrderVC" bundle:nil];
     nav.orderObj=object;
     [self.navigationController pushViewController:nav animated:YES];
+    }
 }
 
 -(void)clickToFeedback:(id)sender{
@@ -327,8 +413,13 @@
 {
     ECSServiceClass * class = [[ECSServiceClass alloc]init];
     [class setServiceMethod:POST];
-    
-    [class setServiceURL:[NSString stringWithFormat:@"%@table_assign_to_waiter",SERVERURLPATH]];
+    NSString *selectedIp=[ECSUserDefault getStringFromUserDefaultForKey:@"ResetIP"];
+    if (selectedIp.length) {
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@table_assign_to_waiter",selectedIp,SERVERURLPATH]];
+    }else{
+        [class setServiceURL:[NSString stringWithFormat:@"http://%@%@table_assign_to_waiter",@"tabqy.com",SERVERURLPATH]];
+    }
+  //  [class setServiceURL:[NSString stringWithFormat:@"%@table_assign_to_waiter",SERVERURLPATH]];
     
     NSMutableDictionary *dict = [[NSMutableDictionary alloc] initWithObjectsAndKeys:
                                  self.appUserObject.user_id, @"user_id",
@@ -359,7 +450,7 @@
         [self.tblAllTable reloadData];
     }
     
-    else [ECSAlert showAlert:@"Error!"];
+    else [ECSAlert showAlert:@"Server Issue."];
     
 }
 
@@ -451,18 +542,18 @@
     
 }
 
--(void)openSideMenuButtonClicked:(UIButton *)sender{
-    
-    MVYSideMenuController *sideMenuController = [self sideMenuController];
-    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
-    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
-    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
-    if (sideMenuController) {
-        
-        [sideMenuController openMenu];
-    }
-    
-}
+//-(void)openSideMenuButtonClicked:(UIButton *)sender{
+//    
+//    MVYSideMenuController *sideMenuController = [self sideMenuController];
+//    //  DS_SideMenuVC * vc = (DS_SideMenuVC *)sideMenuController.menuViewController;
+//    NSLog(@" test==%@ ",self.appUserObject.sidebarColor);
+//    NSLog(@" testActive==%@ ",self.appUserObject.sidebarActiveColor);
+//    if (sideMenuController) {
+//        
+//        [sideMenuController openMenu];
+//    }
+//    
+//}
 
 -(IBAction)onclickBg:(id)sender{
     self.viewAllTable.hidden=YES;

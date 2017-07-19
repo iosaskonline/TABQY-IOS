@@ -16,5 +16,5 @@
 @property (weak, nonatomic) IBOutlet UILabel *lbltablename;
 @property (weak, nonatomic) IBOutlet UIButton *btnFeedback;
 @property (weak, nonatomic) IBOutlet UIButton *btnDetail;
-
+@property (weak, nonatomic) IBOutlet UIButton *btnPrint;
 @end
